@@ -1,0 +1,30 @@
+package dk.mosberg.network;
+
+import dk.mosberg.MAM;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.util.Identifier;
+
+/**
+ * Client-to-Server packet for selecting a spell in the spellbook.
+ */
+public record SelectSpellPayload(Identifier spellId) implements CustomPayload {
+
+    public static final CustomPayload.Id<SelectSpellPayload> ID =
+            new CustomPayload.Id<>(Identifier.of(MAM.MOD_ID, "select_spell"));
+
+    public static final PacketCodec<RegistryByteBuf, SelectSpellPayload> CODEC = PacketCodec
+            .tuple(Identifier.PACKET_CODEC, SelectSpellPayload::spellId, SelectSpellPayload::new);
+
+    @Override
+    public Id<? extends CustomPayload> getId() {
+        return ID;
+    }
+
+    public static void register() {
+        PayloadTypeRegistry.playC2S().register(ID, CODEC);
+        MAM.LOGGER.info("Registered SelectSpellPayload");
+    }
+}

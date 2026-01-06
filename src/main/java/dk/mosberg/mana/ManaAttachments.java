@@ -48,10 +48,7 @@ public class ManaAttachments {
 
     // NBT-based codec for attachment persistence
     private static final Codec<PlayerManaData> NBT_CODEC =
-            Codec.unit(new PlayerManaData()).xmap(data -> data, data -> {
-                // This is for deserialization - we'll handle it in copyOnDeath
-                return data;
-            });
+            Codec.STRING.xmap(str -> new PlayerManaData(), data -> "mana");
 
     public static final AttachmentType<PlayerManaData> PLAYER_MANA =
             AttachmentRegistry.<PlayerManaData>builder().persistent(new Codec<PlayerManaData>() {

@@ -1,26 +1,16 @@
 package dk.mosberg.spell;
 
 import dk.mosberg.MAM;
+import dk.mosberg.entity.SpellProjectileEntity;
 import dk.mosberg.mana.ManaAttachments;
 import dk.mosberg.mana.PlayerManaData;
 import dk.mosberg.network.ServerNetworkHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-
-import java.util.List;
 
 /**
  * Handles spell casting logic on the server.
@@ -28,7 +18,8 @@ import java.util.List;
 public class SpellCaster {
 
     public static void castSpell(ServerPlayerEntity player, Spell spell) {
-        PlayerManaData manaData = player.getAttachedOrCreate(ManaAttachments.PLAYER_MANA);
+        PlayerManaData manaData =
+                player.getAttachedOrCreate(ManaAttachments.PLAYER_MANA, PlayerManaData::new);
 
         // Check mana cost
         if (!manaData.consumeMana(spell.getManaCost())) {
@@ -50,77 +41,53 @@ public class SpellCaster {
 
         // Play sound effect
         if (!spell.getSound().isEmpty()) {
-            try {
-                Identifier soundId = Identifier.tryParse(spell.getSound());
-                if (soundId != null) {
-                    player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
-                            SoundEvents.ENTITY_EVOKER_CAST_SPELL, // Fallback sound
-                            SoundCategory.PLAYERS, 1.0f, 1.0f);
-                }
-            } catch (Exception e) {
-                MAM.LOGGER.warn("Invalid sound ID: {}", spell.getSound());
-            }
+            ServerWorld world = (ServerWorld) player.getEntityWorld();
+            world.playSound(null, player.getX(), player.getY(), player.getZ(),
+                    SoundEvents.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1.0f, 1.0f);
+            MAM.LOGGER.debug("Spell {} has sound effect: {}", spell.getId(), spell.getSound());
         }
 
         MAM.LOGGER.debug("Player {} cast spell {}", player.getName().getString(), spell.getId());
     }
 
     private static void castProjectile(ServerPlayerEntity player, Spell spell) {
-        // TODO: Create custom projectile entity
-        // For now, apply damage to entities in front of player
-        Vec3d lookVec = player.getRotationVec(1.0f);
-        Vec3d start = player.getEyePos();
-        Vec3d end = start.add(lookVec.multiply(spell.getRange()));
+        ServerWorld world = (ServerWorld) player.getEntityWorld();
 
-        // Simple raycast for now
-        List<Entity> entities = player.getWorld().getOtherEntities(player,
-                new Box(start, end).expand(2.0), entity -> entity instanceof LivingEntity);
+        // Create and spawn projectile entity
+        SpellProjectileEntity projectile = new SpellProjectileEntity(world, player, spell);
+        world.spawnEntity(projectile);
 
-        for (Entity entity : entities) {
-            if (entity instanceof LivingEntity living) {
-                living.damage(player.getDamageSources().magic(), spell.getDamage());
-
-                // Apply status effects
-                for (Spell.StatusEffectEntry effectEntry : spell.getStatusEffects()) {
-                    effectEntry.getStatusEffect().ifPresent(effect -> {
-                        living.addStatusEffect(new StatusEffectInstance(effect,
-                                effectEntry.duration(), effectEntry.amplifier()));
-                    });
-                }
-
-                // Apply knockback
-                if (spell.getKnockback() > 0) {
-                    Vec3d knockbackVec = lookVec.normalize().multiply(spell.getKnockback());
-                    living.setVelocity(living.getVelocity().add(knockbackVec));
-                    living.velocityModified = true;
-                }
-
-                break; // Hit first entity
-            }
-        }
+        MAM.LOGGER.debug("Casting projectile spell: {}", spell.getId());
     }
 
     private static void castAoE(ServerPlayerEntity player, Spell spell) {
-        Vec3d center = player.getPos();
+        ServerWorld world = (ServerWorld) player.getEntityWorld();
+
+        // Get entities in AoE radius
         double radius = spell.getAoeRadius();
+        world.getEntitiesByClass(net.minecraft.entity.LivingEntity.class,
+                player.getBoundingBox().expand(radius),
+                entity -> entity != player && entity.squaredDistanceTo(player) <= radius * radius)
+                .forEach(entity -> {
+                    // Apply damage
+                    entity.damage(world, player.getDamageSources().playerAttack(player),
+                            spell.getDamage());
 
-        List<Entity> entities = player.getWorld().getOtherEntities(player,
-                new Box(center, center).expand(radius), entity -> entity instanceof LivingEntity
-                        && entity.squaredDistanceTo(center) <= radius * radius);
+                    // Apply knockback
+                    if (spell.getKnockback() > 0) {
+                        net.minecraft.util.math.Vec3d knockbackVec =
+                                new net.minecraft.util.math.Vec3d(entity.getX(), entity.getY(),
+                                        entity.getZ()).subtract(
+                                                new net.minecraft.util.math.Vec3d(player.getX(),
+                                                        player.getY(), player.getZ()))
+                                                .normalize().multiply(spell.getKnockback());
+                        entity.addVelocity(knockbackVec.x, 0.2, knockbackVec.z);
+                        entity.setVelocityClient(
+                                entity.getVelocity().add(knockbackVec.x, 0.2, knockbackVec.z));
+                    }
+                });
 
-        for (Entity entity : entities) {
-            if (entity instanceof LivingEntity living) {
-                living.damage(player.getDamageSources().magic(), spell.getDamage());
-
-                // Apply status effects
-                for (Spell.StatusEffectEntry effectEntry : spell.getStatusEffects()) {
-                    effectEntry.getStatusEffect().ifPresent(effect -> {
-                        living.addStatusEffect(new StatusEffectInstance(effect,
-                                effectEntry.duration(), effectEntry.amplifier()));
-                    });
-                }
-            }
-        }
+        MAM.LOGGER.debug("Casting AoE spell: {} with radius {}", spell.getId(), radius);
     }
 
     private static void castUtility(ServerPlayerEntity player, Spell spell) {

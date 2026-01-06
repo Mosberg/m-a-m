@@ -3,6 +3,7 @@ package dk.mosberg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import dk.mosberg.config.ServerConfig;
+import dk.mosberg.entity.MAMEntities;
 import dk.mosberg.item.MAMDataComponents;
 import dk.mosberg.item.SpellbookItem;
 import dk.mosberg.item.StaffItem;
@@ -10,6 +11,8 @@ import dk.mosberg.mana.ManaAttachments;
 import dk.mosberg.mana.ManaRegenerationHandler;
 import dk.mosberg.network.CastSpellPayload;
 import dk.mosberg.network.ManaSyncPayload;
+import dk.mosberg.network.OpenSpellBookPayload;
+import dk.mosberg.network.SelectSpellPayload;
 import dk.mosberg.network.ServerNetworkHandler;
 import dk.mosberg.spell.SpellRegistry;
 import net.fabricmc.api.ModInitializer;
@@ -18,6 +21,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 
 public class MAM implements ModInitializer {
@@ -31,34 +36,61 @@ public class MAM implements ModInitializer {
 	// ═════════════════════════════════════════════════════════════════════════════
 	// Gemstone Items
 	// ═════════════════════════════════════════════════════════════════════════════
-	public static final Item RUBY = registerItem("ruby", new Item(new Item.Settings()));
-	public static final Item SAPPHIRE = registerItem("sapphire", new Item(new Item.Settings()));
-	public static final Item MOONSTONE = registerItem("moonstone", new Item(new Item.Settings()));
-	public static final Item PERIDOT = registerItem("peridot", new Item(new Item.Settings()));
+	public static final Item RUBY = registerItem("ruby", new Item(new Item.Settings()
+			.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "ruby")))));
+	public static final Item SAPPHIRE = registerItem("sapphire", new Item(new Item.Settings()
+			.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "sapphire")))));
+	public static final Item MOONSTONE = registerItem("moonstone", new Item(new Item.Settings()
+			.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "moonstone")))));
+	public static final Item PERIDOT = registerItem("peridot", new Item(new Item.Settings()
+			.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "peridot")))));
 
 	// ═════════════════════════════════════════════════════════════════════════════
 	// Staff Items (4 tiers)
 	// ═════════════════════════════════════════════════════════════════════════════
 	public static final Item STAFF_NOVICE =
-			registerItem("staff_novice", new StaffItem(new Item.Settings().maxCount(1), 1));
-	public static final Item STAFF_APPRENTICE =
-			registerItem("staff_apprentice", new StaffItem(new Item.Settings().maxCount(1), 2));
+			registerItem("staff_novice",
+					new StaffItem(
+							new Item.Settings().maxCount(1).registryKey(RegistryKey
+									.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "staff_novice"))),
+							1));
+	public static final Item STAFF_APPRENTICE = registerItem("staff_apprentice",
+			new StaffItem(new Item.Settings().maxCount(1).registryKey(
+					RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "staff_apprentice"))),
+					2));
 	public static final Item STAFF_ADEPT =
-			registerItem("staff_adept", new StaffItem(new Item.Settings().maxCount(1), 3));
+			registerItem("staff_adept",
+					new StaffItem(
+							new Item.Settings().maxCount(1).registryKey(RegistryKey
+									.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "staff_adept"))),
+							3));
 	public static final Item STAFF_MASTER =
-			registerItem("staff_master", new StaffItem(new Item.Settings().maxCount(1), 4));
+			registerItem("staff_master",
+					new StaffItem(
+							new Item.Settings().maxCount(1).registryKey(RegistryKey
+									.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "staff_master"))),
+							4));
 
 	// ═════════════════════════════════════════════════════════════════════════════
 	// Spellbook Items (4 tiers)
 	// ═════════════════════════════════════════════════════════════════════════════
-	public static final Item SPELLBOOK_NOVICE =
-			registerItem("spellbook_novice", new SpellbookItem(new Item.Settings().maxCount(1), 1));
-	public static final Item SPELLBOOK_APPRENTICE = registerItem("spellbook_apprentice",
-			new SpellbookItem(new Item.Settings().maxCount(1), 2));
-	public static final Item SPELLBOOK_ADEPT =
-			registerItem("spellbook_adept", new SpellbookItem(new Item.Settings().maxCount(1), 3));
-	public static final Item SPELLBOOK_MASTER =
-			registerItem("spellbook_master", new SpellbookItem(new Item.Settings().maxCount(1), 4));
+	public static final Item SPELLBOOK_NOVICE = registerItem("spellbook_novice",
+			new SpellbookItem(new Item.Settings().maxCount(1).registryKey(
+					RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "spellbook_novice"))),
+					1));
+	public static final Item SPELLBOOK_APPRENTICE =
+			registerItem("spellbook_apprentice",
+					new SpellbookItem(new Item.Settings().maxCount(1).registryKey(RegistryKey
+							.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "spellbook_apprentice"))),
+							2));
+	public static final Item SPELLBOOK_ADEPT = registerItem("spellbook_adept",
+			new SpellbookItem(new Item.Settings().maxCount(1).registryKey(
+					RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "spellbook_adept"))),
+					3));
+	public static final Item SPELLBOOK_MASTER = registerItem("spellbook_master",
+			new SpellbookItem(new Item.Settings().maxCount(1).registryKey(
+					RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "spellbook_master"))),
+					4));
 
 	@Override
 	public void onInitialize() {
@@ -71,6 +103,9 @@ public class MAM implements ModInitializer {
 		// Register data components
 		MAMDataComponents.register();
 
+		// Register entities
+		MAMEntities.register();
+
 		// Register mana system
 		ManaAttachments.register();
 		ManaRegenerationHandler.register();
@@ -81,6 +116,8 @@ public class MAM implements ModInitializer {
 		// Register networking
 		CastSpellPayload.register();
 		ManaSyncPayload.register();
+		SelectSpellPayload.register();
+		OpenSpellBookPayload.register();
 		ServerNetworkHandler.register();
 
 		// Load server config

@@ -20,6 +20,9 @@
   "item.mam.spellbook_master": "Master Spellbook",
   "item.mam.spellbook.open": "Opening spellbook... (GUI coming soon)",
 
+  "gui.mam.spell_selection": "Spell Selection",
+  "spell.mam.selected": "Selected spell: %s",
+
   "item.mam.projectile_air": "Air Projectile",
   "item.mam.projectile_earth": "Earth Projectile",
   "item.mam.projectile_fire": "Fire Projectile",

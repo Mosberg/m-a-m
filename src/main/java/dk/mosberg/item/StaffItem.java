@@ -1,18 +1,16 @@
 package dk.mosberg.item;
 
 import java.util.List;
-import dk.mosberg.network.CastSpellPayload;
 import dk.mosberg.spell.Spell;
 import dk.mosberg.spell.SpellRegistry;
 import dk.mosberg.spell.SpellSchool;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 
 /**
@@ -27,36 +25,33 @@ public class StaffItem extends Item {
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+    public ActionResult use(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
 
         // Get selected spell from NBT
         String spellIdStr = stack.get(MAMDataComponents.SELECTED_SPELL);
 
         if (spellIdStr == null || spellIdStr.isEmpty()) {
-            if (world.isClient) {
+            if (world.isClient()) {
                 player.sendMessage(Text.translatable("item.mam.staff.no_spell"), true);
             }
-            return TypedActionResult.fail(stack);
+            return ActionResult.FAIL;
         }
 
         Identifier spellId = Identifier.tryParse(spellIdStr);
         if (spellId == null) {
-            return TypedActionResult.fail(stack);
+            return ActionResult.FAIL;
         }
 
-        // On client side, send packet to server
-        if (world.isClient) {
-            ClientPlayNetworking.send(new CastSpellPayload(spellId));
+        if (!world.isClient()) {
+            player.getItemCooldownManager().set(stack, 20); // 1 second cooldown
         }
-
-        player.getItemCooldownManager().set(this, 20); // 1 second cooldown
-        return TypedActionResult.success(stack, world.isClient);
+        return ActionResult.SUCCESS;
     }
 
     @Override
     public Text getName(ItemStack stack) {
-        return Text.translatable(this.getTranslationKey(stack));
+        return super.getName(stack);
     }
 
     public int getTier() {

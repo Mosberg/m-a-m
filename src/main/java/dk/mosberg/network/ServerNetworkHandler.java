@@ -4,7 +4,6 @@ import dk.mosberg.MAM;
 import dk.mosberg.mana.ManaAttachments;
 import dk.mosberg.mana.ManaPoolType;
 import dk.mosberg.mana.PlayerManaData;
-import dk.mosberg.spell.Spell;
 import dk.mosberg.spell.SpellCaster;
 import dk.mosberg.spell.SpellRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -30,6 +29,24 @@ public class ServerNetworkHandler {
             });
         });
 
+        // Handle spell selection from spellbook GUI
+        ServerPlayNetworking.registerGlobalReceiver(SelectSpellPayload.ID, (payload, context) -> {
+            context.server().execute(() -> {
+                var player = context.player();
+                var spell = SpellRegistry.getSpell(payload.spellId());
+
+                if (spell.isPresent()) {
+                    // Store selected spell in player data or item NBT
+                    // For now, just log the selection
+                    MAM.LOGGER.debug("Player {} selected spell: {}", player.getName().getString(),
+                            spell.get().getName());
+                } else {
+                    MAM.LOGGER.warn("Player {} tried to select unknown spell: {}",
+                            player.getName().getString(), payload.spellId());
+                }
+            });
+        });
+
         MAM.LOGGER.info("Registered server network handlers");
     }
 
@@ -37,7 +54,8 @@ public class ServerNetworkHandler {
      * Sends mana data to a client.
      */
     public static void syncManaToClient(net.minecraft.server.network.ServerPlayerEntity player) {
-        PlayerManaData manaData = player.getAttachedOrCreate(ManaAttachments.PLAYER_MANA);
+        PlayerManaData manaData =
+                player.getAttachedOrCreate(ManaAttachments.PLAYER_MANA, PlayerManaData::new);
 
         ManaSyncPayload payload =
                 new ManaSyncPayload(manaData.getPool(ManaPoolType.PERSONAL).getCurrentMana(),

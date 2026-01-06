@@ -20,7 +20,7 @@ public class PlayerManaData {
 
     /**
      * Attempts to consume mana, using the priority pool first. Falls back to other pools if needed.
-     * 
+     *
      * @param amount Amount of mana to consume
      * @return true if mana was successfully consumed
      */
@@ -89,20 +89,21 @@ public class PlayerManaData {
      */
     public void readNbt(NbtCompound nbt) {
         if (nbt.contains("pools")) {
-            NbtCompound poolsNbt = nbt.getCompound("pools");
+            NbtCompound poolsNbt = nbt.getCompound("pools").get();
             for (ManaPoolType type : ManaPoolType.values()) {
                 if (poolsNbt.contains(type.name())) {
-                    NbtCompound poolNbt = poolsNbt.getCompound(type.name());
-                    float current = poolNbt.getFloat("current");
-                    int max = poolNbt.getInt("max");
-                    float regen = poolNbt.getFloat("regen");
+                    NbtCompound poolNbt = poolsNbt.getCompound(type.name()).get();
+                    float current = poolNbt.getFloat("current").get();
+                    int max = poolNbt.getInt("max").get();
+                    float regen = poolNbt.getFloat("regen").get();
                     pools.put(type, new ManaPool(max, current, regen));
                 }
             }
         }
         if (nbt.contains("activePriority")) {
             try {
-                activePriority = ManaPoolType.valueOf(nbt.getString("activePriority"));
+                String priorityStr = nbt.getString("activePriority").get();
+                activePriority = ManaPoolType.valueOf(priorityStr);
             } catch (IllegalArgumentException e) {
                 activePriority = ManaPoolType.PERSONAL;
             }

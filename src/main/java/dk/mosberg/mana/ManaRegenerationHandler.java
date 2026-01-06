@@ -12,7 +12,8 @@ public class ManaRegenerationHandler {
     public static void register() {
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-                PlayerManaData manaData = player.getAttachedOrCreate(ManaAttachments.PLAYER_MANA);
+                PlayerManaData manaData = player.getAttachedOrCreate(ManaAttachments.PLAYER_MANA,
+                        PlayerManaData::new);
                 manaData.tickRegeneration();
             }
         });

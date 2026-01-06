@@ -1,57 +1,49 @@
 package dk.mosberg.spell;
 
+import java.util.List;
+import java.util.Optional;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Represents a spell loaded from JSON data.
  */
 public class Spell {
 
-    public static final Codec<Spell> CODEC = RecordCodecBuilder.create(instance -> instance
-            .group(Identifier.CODEC.fieldOf("id").forGetter(spell -> spell.id),
-                    Codec.STRING.fieldOf("name").forGetter(spell -> spell.name),
-                    Codec.STRING.fieldOf("school")
-                            .forGetter(spell -> spell.school.name().toLowerCase()),
-                    Codec.STRING
-                            .optionalFieldOf("description", "")
-                            .forGetter(spell -> spell.description),
-                    Codec.STRING
-                            .fieldOf("castType")
-                            .forGetter(spell -> spell.castType.name().toLowerCase()),
-                    Codec.FLOAT.fieldOf("manaCost").forGetter(spell -> spell.manaCost),
-                    Codec.FLOAT.optionalFieldOf("castTime", 1.0f)
-                            .forGetter(spell -> spell.castTime),
-                    Codec.FLOAT.optionalFieldOf("cooldown", 0.0f)
-                            .forGetter(spell -> spell.cooldown),
-                    Codec.INT.fieldOf("tier").forGetter(spell -> spell.tier),
-                    Codec.INT.optionalFieldOf("requiredLevel", 1)
-                            .forGetter(spell -> spell.requiredLevel),
-                    Codec.FLOAT.optionalFieldOf("damage", 0.0f).forGetter(spell -> spell.damage),
-                    Codec.FLOAT.optionalFieldOf("range", 30.0f).forGetter(spell -> spell.range),
-                    Codec.FLOAT
-                            .optionalFieldOf("projectileSpeed", 1.0f)
-                            .forGetter(spell -> spell.projectileSpeed),
-                    Codec.FLOAT.optionalFieldOf("aoeRadius", 0.0f)
-                            .forGetter(spell -> spell.aoeRadius),
-                    Codec.FLOAT.optionalFieldOf("knockback", 0.0f)
-                            .forGetter(spell -> spell.knockback),
-                    StatusEffectEntry.CODEC.listOf().optionalFieldOf("statusEffects", List.of())
-                            .forGetter(spell -> spell.statusEffects),
-                    Codec.unboundedMap(Codec.STRING, Codec.FLOAT)
-                            .optionalFieldOf("customData", java.util.Map.of())
-                            .forGetter(spell -> spell.customData),
-                    Codec.STRING.optionalFieldOf("sound", "").forGetter(spell -> spell.sound),
-                    VfxData.CODEC.optionalFieldOf("vfx")
-                            .forGetter(spell -> Optional.ofNullable(spell.vfx)))
-            .apply(instance, Spell::new));
+    private static final Codec<SpellSchool> SCHOOL_CODEC = Codec.STRING
+            .xmap(s -> SpellSchool.valueOf(s.toUpperCase()), school -> school.name().toLowerCase());
+
+    private static final Codec<SpellCastType> CAST_TYPE_CODEC = Codec.STRING.xmap(
+            c -> SpellCastType.valueOf(c.toUpperCase()), castType -> castType.name().toLowerCase());
+
+    public static final Codec<Spell> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Identifier.CODEC.fieldOf("id").forGetter(Spell::getId),
+            Codec.STRING.fieldOf("name").forGetter(Spell::getName),
+            Codec.STRING.fieldOf("school").forGetter((Spell spell) -> spell.getSchool().name()),
+            Codec.STRING.optionalFieldOf("description", "").forGetter(Spell::getDescription),
+            Codec.STRING.fieldOf("castType").forGetter((Spell spell) -> spell.getCastType().name()),
+            Codec.FLOAT.fieldOf("manaCost").forGetter(Spell::getManaCost),
+            Codec.FLOAT.optionalFieldOf("castTime", 1.0f).forGetter(Spell::getCastTime),
+            Codec.FLOAT.optionalFieldOf("cooldown", 0.0f).forGetter(Spell::getCooldown),
+            Codec.INT.fieldOf("tier").forGetter(Spell::getTier),
+            Codec.INT.optionalFieldOf("requiredLevel", 1).forGetter(Spell::getRequiredLevel),
+            Codec.FLOAT.optionalFieldOf("damage", 0.0f).forGetter(Spell::getDamage),
+            Codec.FLOAT.optionalFieldOf("range", 30.0f).forGetter(Spell::getRange),
+            Codec.FLOAT.optionalFieldOf("projectileSpeed", 1.0f)
+                    .forGetter(Spell::getProjectileSpeed),
+            Codec.FLOAT.optionalFieldOf("aoeRadius", 0.0f).forGetter(Spell::getAoeRadius),
+            Codec.FLOAT.optionalFieldOf("knockback", 0.0f).forGetter(Spell::getKnockback),
+            Codec.STRING.optionalFieldOf("sound", "").forGetter(Spell::getSound))
+            .apply(instance,
+                    (id, name, school, desc, castType, manaCost, castTime, cooldown, tier,
+                            requiredLevel, damage, range, projectileSpeed, aoeRadius, knockback,
+                            sound) -> new Spell(id, name, school, desc, castType, manaCost,
+                                    castTime, cooldown, tier, requiredLevel, damage, range,
+                                    projectileSpeed, aoeRadius, knockback, List.of(),
+                                    java.util.Map.of(), sound, Optional.empty())));
 
     private final Identifier id;
     private final String name;
@@ -97,6 +89,19 @@ public class Spell {
         this.customData = customData;
         this.sound = sound;
         this.vfx = vfx.orElse(null);
+    }
+
+    /**
+     * Factory method for codec deserialization. Converts string representations to enum values.
+     */
+    public static Spell create(Identifier id, String name, String school, String description,
+            String castType, float manaCost, float castTime, float cooldown, int tier,
+            int requiredLevel, float damage, float range, float projectileSpeed, float aoeRadius,
+            float knockback, List<StatusEffectEntry> statusEffects,
+            java.util.Map<String, Float> customData, String sound, Optional<VfxData> vfx) {
+        return new Spell(id, name, school, description, castType, manaCost, castTime, cooldown,
+                tier, requiredLevel, damage, range, projectileSpeed, aoeRadius, knockback,
+                statusEffects, customData, sound, vfx);
     }
 
     // Getters
@@ -176,6 +181,10 @@ public class Spell {
         return vfx;
     }
 
+    public Optional<VfxData> getVfxOptional() {
+        return Optional.ofNullable(vfx);
+    }
+
     public String getTranslationKey() {
         return "spell." + id.getNamespace() + "." + id.getPath();
     }
@@ -192,7 +201,9 @@ public class Spell {
                         .apply(instance, StatusEffectEntry::new));
 
         public Optional<RegistryEntry<StatusEffect>> getStatusEffect() {
-            return Registries.STATUS_EFFECT.getEntry(Identifier.tryParse(effect));
+            // For now, return empty - status effects are optional
+            // TODO: Implement proper status effect lookup when API allows
+            return Optional.empty();
         }
     }
 
