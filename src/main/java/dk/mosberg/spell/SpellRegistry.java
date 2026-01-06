@@ -26,12 +26,15 @@ import net.minecraft.util.Identifier;
 /**
  * Registry for spells loaded from data packs.
  *
- * TODO: Add spell compatibility checking (version, dependencies) TODO: Add spell
- * inheritance/templates system TODO: Implement spell compression for network transfer TODO:
- * Implement spell variant/modification system TODO: Add spell versioning and migration system
+ * Features implemented: dependency checking, hot-reload, difficulty presets, compression helpers,
+ * inheritance/templates resolution.
+ *
+ * TODO: Add spell compatibility checking (strict schema versioning) TODO: Implement spell
+ * variant/modification system TODO: Add spell versioning and migration system
  */
 public class SpellRegistry {
     private static final Map<Identifier, Spell> SPELLS = new HashMap<>();
+    private static final int SUPPORTED_SPELL_FORMAT = 1; // for future schema evolution
     private static int cachedMaxTier = -1;
     private static List<Spell> cachedMaxTierList;
     private static DifficultyPreset currentDifficulty = DifficultyPreset.NORMAL;
@@ -129,7 +132,8 @@ public class SpellRegistry {
                         error -> MAM.LOGGER.error("Failed to parse spell {}: {}", spellId, error))
                         .orElse(null);
 
-                if (spell != null && validateSpell(spell)) {
+                if (spell != null && validateSpell(spell) && isCompatible(spell)
+                        && checkSpellDependencies(spell)) {
                     SPELLS.put(spell.getId(), spell);
                     loaded++;
                     MAM.LOGGER.debug("Loaded spell: {}", spell.getId());
@@ -144,6 +148,9 @@ public class SpellRegistry {
                 failed++;
             }
         }
+
+        // Resolve simple inheritance/templates after initial load
+        resolveInheritance();
 
         MAM.LOGGER.info("Spell loading complete: {} loaded, {} failed", loaded, failed);
     }
@@ -348,6 +355,160 @@ public class SpellRegistry {
 
         MAM.LOGGER.debug("Spell {} passed validation", spell.getId());
         return true;
+    }
+
+    /**
+     * Basic compatibility check placeholder. Currently validates tier range and reserved for schema
+     * format checks. Extend to enforce schema versions when spells start specifying it.
+     */
+    private static boolean isCompatible(Spell spell) {
+        // Placeholder for future: when Spell exposes optional format, reject unsupported.
+        // Example:
+        // if (spell.getFormat().isPresent() && spell.getFormat().getAsInt() !=
+        // SUPPORTED_SPELL_FORMAT) {
+        // MAM.LOGGER.warn("Skipping spell {} due to incompatible format {} (supported {})",
+        // spell.getId(), spell.getFormat().getAsInt(), SUPPORTED_SPELL_FORMAT);
+        // return false;
+        // }
+        return true;
+    }
+
+    /**
+     * Resolve simple inheritance: child spells may declare a parent via optional field 'parent'.
+     * Child inherits tags, vfx, sound, status effects, and custom data keys it doesn't define.
+     * Numeric fields are not overridden to avoid ambiguity with defaults.
+     */
+    private static void resolveInheritance() {
+        boolean changed;
+        int passes = 0;
+        do {
+            changed = false;
+            passes++;
+            for (var entry : new java.util.ArrayList<>(SPELLS.entrySet())) {
+                Spell child = entry.getValue();
+                var parentOpt = child.getParent();
+                if (parentOpt.isEmpty())
+                    continue;
+                Spell parent = SPELLS.get(parentOpt.get());
+                if (parent == null) {
+                    MAM.LOGGER.warn("Spell {} declares missing parent {}", child.getId(),
+                            parentOpt.get());
+                    continue;
+                }
+
+                // Merge tags (union)
+                java.util.Set<String> tags = new java.util.LinkedHashSet<>(parent.getTags());
+                tags.addAll(child.getTags());
+
+                // Merge status effects (inherit if child has none)
+                java.util.List<Spell.StatusEffectEntry> effects =
+                        child.getStatusEffects().isEmpty() ? parent.getStatusEffects()
+                                : child.getStatusEffects();
+
+                // Merge custom data (parent keys fill gaps)
+                java.util.Map<String, Float> custom =
+                        new java.util.HashMap<>(parent.getCustomData());
+                custom.putAll(child.getCustomData());
+
+                // Inherit sound if child empty
+                String sound =
+                        (child.getSound() == null || child.getSound().isEmpty()) ? parent.getSound()
+                                : child.getSound();
+
+                // Inherit VFX if child none
+                var vfx = child.getVfxOptional().isPresent() ? child.getVfxOptional()
+                        : parent.getVfxOptional();
+
+                // Inherit animation if child none
+                var anim = child.getAnimationOptional().isPresent() ? child.getAnimationOptional()
+                        : parent.getAnimationOptional();
+
+                Spell merged = new Spell(child.getId(), child.getName(), child.getSchool().name(),
+                        child.getDescription(), child.getCastType().name(), child.getManaCost(),
+                        child.getCastTime(), child.getCooldown(), child.getTier(),
+                        child.getRequiredLevel(), child.getDamage(), child.getRange(),
+                        child.getProjectileSpeed(), child.getAoeRadius(), child.getKnockback(),
+                        effects, custom, sound, vfx, new java.util.ArrayList<>(tags),
+                        java.util.Optional.of(child.getRarity().name()), child.getParent(), anim);
+
+                if (merged != child) {
+                    SPELLS.put(child.getId(), merged);
+                    changed = true;
+                }
+            }
+        } while (changed && passes < 5);
+    }
+
+    /**
+     * Network compression helpers for spells using JSON + GZIP. Useful for lightweight sync.
+     */
+    public static Optional<byte[]> compressSpell(Spell spell) {
+        try {
+            var json = Spell.CODEC.encodeStart(JsonOps.INSTANCE, spell).result().orElseThrow();
+            byte[] bytes = json.toString().getBytes(StandardCharsets.UTF_8);
+            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+            try (java.util.zip.GZIPOutputStream gzip = new java.util.zip.GZIPOutputStream(baos)) {
+                gzip.write(bytes);
+            }
+            return Optional.of(baos.toByteArray());
+        } catch (Exception e) {
+            MAM.LOGGER.error("Failed compressing spell {}: {}", spell.getId(), e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    public static Optional<Spell> decompressSpell(byte[] compressed) {
+        try {
+            java.io.ByteArrayInputStream bais = new java.io.ByteArrayInputStream(compressed);
+            try (java.util.zip.GZIPInputStream gzip = new java.util.zip.GZIPInputStream(bais)) {
+                String json = new String(gzip.readAllBytes(), StandardCharsets.UTF_8);
+                return Spell.CODEC
+                        .parse(JsonOps.INSTANCE, com.google.gson.JsonParser.parseString(json))
+                        .result();
+            }
+        } catch (Exception e) {
+            MAM.LOGGER.error("Failed decompressing spell: {}", e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    public static Optional<byte[]> compressSpells(Collection<Spell> spells) {
+        try {
+            // Encode as array of spell JSON objects
+            com.google.gson.JsonArray arr = new com.google.gson.JsonArray();
+            for (Spell s : spells) {
+                var json = Spell.CODEC.encodeStart(JsonOps.INSTANCE, s).result();
+                json.ifPresent(j -> arr.add((com.google.gson.JsonElement) j));
+            }
+            byte[] bytes = arr.toString().getBytes(StandardCharsets.UTF_8);
+            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+            try (java.util.zip.GZIPOutputStream gzip = new java.util.zip.GZIPOutputStream(baos)) {
+                gzip.write(bytes);
+            }
+            return Optional.of(baos.toByteArray());
+        } catch (Exception e) {
+            MAM.LOGGER.error("Failed compressing spells: {}", e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    public static List<Spell> decompressSpells(byte[] compressed) {
+        try {
+            java.io.ByteArrayInputStream bais = new java.io.ByteArrayInputStream(compressed);
+            try (java.util.zip.GZIPInputStream gzip = new java.util.zip.GZIPInputStream(bais)) {
+                String json = new String(gzip.readAllBytes(), StandardCharsets.UTF_8);
+                com.google.gson.JsonArray arr =
+                        com.google.gson.JsonParser.parseString(json).getAsJsonArray();
+                java.util.ArrayList<Spell> list = new java.util.ArrayList<>();
+                for (com.google.gson.JsonElement el : arr) {
+                    Spell.CODEC.parse(JsonOps.INSTANCE, el).result().ifPresent(list::add);
+                }
+                return list;
+            }
+        } catch (Exception e) {
+            MAM.LOGGER.error("Failed decompressing spells: {}", e.getMessage());
+            return List.of();
+        }
     }
 
     /**

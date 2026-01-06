@@ -34,7 +34,7 @@ This document contains all TODO items from the codebase organized by implementat
 - [x] **ManaPoolType.java** - Implement pool affinity system (players born with pool preferences)
 - [x] **ManaPoolType.java** - Add pool conversion mechanics (convert between pools with penalties)
 - [ ] **ManaPoolType.java** - Implement pool linking (shared pools for teams/guilds)
-- [ ] **ManaPoolType.java** - Add regional pool type variations (biome-based mana types)
+- [x] **ManaPoolType.java** - Add regional pool type variations (biome-based mana types)
 - [x] **ManaPoolType.java** - Implement pool thresholds for special abilities (unlock at % full)
 - [x] **ManaPoolType.java** - Add pool attribute modifiers (affects spell damage, range, cooldown per pool)
 - [x] **ManaPoolType.java** - Implement pool combo bonuses (using multiple pools in sequence)
@@ -55,10 +55,10 @@ This document contains all TODO items from the codebase organized by implementat
 - [x] **SpellRegistry.java** - Implement spell validation on load (check required fields)
 - [ ] **SpellRegistry.java** - Add spell compatibility checking (version, dependencies)
 - [x] **SpellRegistry.java** - Implement hot-reload for spells during development)
-- [ ] **SpellRegistry.java** - Add spell inheritance/templates system
+- [x] **SpellRegistry.java** - Add spell inheritance/templates system
 - [x] **SpellRegistry.java** - Implement spell balancing presets (easy, normal, hard)
 - [x] **SpellRegistry.java** - Add spell tag system for categorization and filtering
-- [ ] **SpellRegistry.java** - Implement spell compression for network transfer
+- [x] **SpellRegistry.java** - Implement spell compression for network transfer
 - [x] **SpellRegistry.java** - Add spell dependency resolution (spells requiring other spells)
 - [ ] **SpellRegistry.java** - Implement spell variant/modification system
 - [ ] **SpellRegistry.java** - Add spell versioning and migration system

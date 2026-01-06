@@ -3,10 +3,9 @@ package dk.mosberg.mana;
 /**
  * Four mana pool types in the advanced mana system.
  *
- * Features implemented: Pool affinity system, pool conversion mechanics.
- *
- * TODO: Implement pool linking (shared pools for teams/guilds) TODO: Add regional pool type
- * variations (biome-based mana types)
+ * Features implemented: Pool affinity system, pool conversion mechanics, regional variations.
+ * 
+ * TODO: Implement pool linking (shared pools for teams/guilds)
  */
 public enum ManaPoolType {
     PERSONAL(250, 0.5f, "Personal", 0xFF4A90E2, 1.0f, 1.0f, 1.0f), // Blue - balanced
@@ -214,6 +213,82 @@ public enum ManaPoolType {
             case RESERVE -> 300; // 15 seconds
             case SKILL -> 150; // 7.5 seconds
         };
+    }
+
+    /**
+     * Regional variations: pools behave differently in certain dimensions/regions. Provides small,
+     * thematic modifiers to regen and damage output.
+     */
+    public float getRegionalRegenModifier(String dimension, boolean isUnderwater) {
+        if (dimension == null)
+            return 1.0f;
+        String dim = dimension.toLowerCase();
+        switch (this) {
+            case PERSONAL:
+                if (isUnderwater)
+                    return 0.9f;
+                return 1.0f;
+            case AURA:
+                if (dim.contains("end"))
+                    return 1.2f; // The End amplifies aura presence
+                if (isUnderwater)
+                    return 0.95f;
+                return 1.0f;
+            case RESERVE:
+                if (dim.contains("nether"))
+                    return 1.15f; // Nether heat fuels reserves
+                if (isUnderwater)
+                    return 0.85f;
+                return 1.0f;
+            case SKILL:
+                if (dim.contains("overworld"))
+                    return 1.1f; // Familiar lands assist precision
+                return 1.0f;
+        }
+    }
+
+    public float getRegionalDamageModifier(String dimension, boolean isUnderwater) {
+        if (dimension == null)
+            return 1.0f;
+        String dim = dimension.toLowerCase();
+        switch (this) {
+            case PERSONAL:
+                return 1.0f;
+            case AURA:
+                if (dim.contains("end"))
+                    return 1.1f;
+                return 1.0f;
+            case RESERVE:
+                if (dim.contains("nether"))
+                    return 1.2f;
+                if (isUnderwater)
+                    return 0.9f;
+                return 1.0f;
+            case SKILL:
+                if (dim.contains("overworld"))
+                    return 1.05f;
+                return 1.0f;
+        }
+    }
+
+    /**
+     * Subtle color shift for UI based on region (packed ARGB). Keeps theme recognizable.
+     */
+    public int getRegionalColor(String dimension) {
+        if (dimension == null)
+            return color;
+        String dim = dimension.toLowerCase();
+        int shift = 0x00000000;
+        if (dim.contains("nether"))
+            shift = 0x00100000; // warmer
+        else if (dim.contains("end"))
+            shift = 0x00001010; // cooler/paler
+        else if (dim.contains("overworld"))
+            shift = 0x00000500; // subtle green
+        int r = Math.min(255, ((color >> 16) & 0xFF) + ((shift >> 16) & 0xFF));
+        int g = Math.min(255, ((color >> 8) & 0xFF) + ((shift >> 8) & 0xFF));
+        int b = Math.min(255, (color & 0xFF) + (shift & 0xFF));
+        return (color & 0xFF000000) | (r << 16) | (g << 8) | b;
     }
 
     /**
