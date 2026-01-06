@@ -3,6 +3,7 @@ package dk.mosberg.entity;
 import dk.mosberg.MAM;
 import dk.mosberg.spell.Spell;
 import dk.mosberg.spell.SpellSchool;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.FlyingItemEntity;
@@ -14,8 +15,12 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.ItemStack;
+import net.minecraft.particle.BlockStateParticleEffect;
+import net.minecraft.particle.ParticleEffect;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.util.Identifier;
@@ -65,6 +70,7 @@ public class SpellProjectileEntity extends ProjectileEntity implements FlyingIte
         this.setNoGravity(true);
     }
 
+    @SuppressWarnings("null")
     @Override
     protected void initDataTracker(DataTracker.Builder builder) {
         // Use safe defaults here; subclass fields are not initialized yet during super constructor
@@ -164,6 +170,8 @@ public class SpellProjectileEntity extends ProjectileEntity implements FlyingIte
             }
         }
 
+        spawnImpactParticles();
+
         // Remove projectile on hit
         this.discard();
     }
@@ -174,12 +182,48 @@ public class SpellProjectileEntity extends ProjectileEntity implements FlyingIte
 
         // Remove projectile when hitting anything
         if (!this.getEntityWorld().isClient()) {
+            spawnImpactParticles();
             this.discard();
         }
     }
 
     private void spawnParticles() {
         // Particle spawning will be handled by renderer
+    }
+
+    private void spawnImpactParticles() {
+        if (!(this.getEntityWorld() instanceof ServerWorld serverWorld)) {
+            return;
+        }
+
+        ParticleEffect effect;
+        int count;
+        switch (getSchool()) {
+            case FIRE -> {
+                effect = ParticleTypes.FLAME;
+                count = 12;
+            }
+            case WATER -> {
+                effect = ParticleTypes.SPLASH;
+                count = 12;
+            }
+            case AIR -> {
+                effect = ParticleTypes.CLOUD;
+                count = 10;
+            }
+            case EARTH -> {
+                effect = new BlockStateParticleEffect(ParticleTypes.BLOCK,
+                        Blocks.DIRT.getDefaultState());
+                count = 12;
+            }
+            default -> {
+                effect = ParticleTypes.CRIT;
+                count = 8;
+            }
+        }
+
+        serverWorld.spawnParticles(effect, this.getX(), this.getBodyY(0.5), this.getZ(), count, 0.2,
+                0.2, 0.2, 0.02);
     }
 
     @Override

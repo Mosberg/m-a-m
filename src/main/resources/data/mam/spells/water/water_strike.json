@@ -4,7 +4,7 @@
   "school": "water",
   "description": "A focused jet of water that hits enemies, dealing moderate damage and slowing them down temporarily.",
   "castType": "projectile",
-  "manaCost": 13.0,
+  "manaCost": 10.0,
   "castTime": 1.0,
   "cooldown": 5.0,
   "tier": 1,
@@ -21,7 +21,8 @@
   "sound": "entity.player.splash",
   "vfx": {
     "particleType": "splash",
-    "particleCount": 50,
+    "particleCount": 22,
     "color": "3FA7FF"
-  }
+  },
+  "tags": ["strike", "projectile", "tier1", "water"]
 }

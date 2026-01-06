@@ -4,7 +4,7 @@
   "school": "earth",
   "description": "A stone projectile that hits enemies, dealing moderate damage and stunning them temporarily.",
   "castType": "projectile",
-  "manaCost": 13.0,
+  "manaCost": 10.0,
   "castTime": 1.0,
   "cooldown": 5.0,
   "tier": 1,
@@ -21,7 +21,8 @@
   "sound": "block.stone.break",
   "vfx": {
     "particleType": "block",
-    "particleCount": 50,
+    "particleCount": 22,
     "color": "696969"
-  }
+  },
+  "tags": ["strike", "projectile", "tier1", "earth"]
 }

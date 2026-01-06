@@ -4,9 +4,9 @@
   "school": "fire",
   "description": "A blazing projectile that scorches enemies on impact, dealing fire damage over a small area.",
   "castType": "projectile",
-  "manaCost": 15.0,
+  "manaCost": 14.0,
   "castTime": 1.0,
-  "cooldown": 5.0,
+  "cooldown": 6.0,
   "tier": 1,
   "requiredLevel": 4,
   "damage": 8.0,
@@ -21,7 +21,8 @@
   "sound": "entity.blaze.shoot",
   "vfx": {
     "particleType": "flame",
-    "particleCount": 50,
+    "particleCount": 26,
     "color": "FF4500"
-  }
+  },
+  "tags": ["strike", "projectile", "tier1", "fire"]
 }

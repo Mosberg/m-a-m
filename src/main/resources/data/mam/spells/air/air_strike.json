@@ -4,9 +4,9 @@
   "school": "air",
   "description": "A concentrated projectile of wind that strikes enemies, dealing moderate damage and knocking them back slightly.",
   "castType": "projectile",
-  "manaCost": 12.0,
+  "manaCost": 8.0,
   "castTime": 1.0,
-  "cooldown": 5.0,
+  "cooldown": 4.0,
   "tier": 1,
   "requiredLevel": 1,
   "damage": 2.0,
@@ -21,7 +21,8 @@
   "sound": "entity.wind_charge.wind_burst",
   "vfx": {
     "particleType": "wind_particle",
-    "particleCount": 50,
+    "particleCount": 20,
     "color": "87CEEB"
-  }
+  },
+  "tags": ["strike", "projectile", "tier1", "air"]
 }
