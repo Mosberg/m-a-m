@@ -23,6 +23,7 @@ public class MagicKeyBindings {
     private static net.minecraft.client.option.KeyBinding openSpellKey;
     private static net.minecraft.client.option.KeyBinding toggleHudKey;
     private static net.minecraft.client.option.KeyBinding toggleHudModeKey;
+    private static net.minecraft.client.option.KeyBinding openHudConfigKey;
 
     /**
      * Register client event handlers.
@@ -47,6 +48,12 @@ public class MagicKeyBindings {
                         org.lwjgl.glfw.GLFW.GLFW_KEY_J,
                         net.minecraft.client.option.KeyBinding.Category.MISC));
 
+        openHudConfigKey = net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
+                .registerKeyBinding(new net.minecraft.client.option.KeyBinding(
+                        "key.mam.open_hud_config", net.minecraft.client.util.InputUtil.Type.KEYSYM,
+                        org.lwjgl.glfw.GLFW.GLFW_KEY_K,
+                        net.minecraft.client.option.KeyBinding.Category.MISC));
+
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (openSpellKey.wasPressed()) {
                 openSpellSelectionScreen(client);
@@ -58,6 +65,12 @@ public class MagicKeyBindings {
 
             while (toggleHudModeKey.wasPressed()) {
                 dk.mosberg.client.hud.ManaHudOverlay.cycleMode();
+            }
+
+            while (openHudConfigKey.wasPressed()) {
+                if (client.currentScreen == null) {
+                    client.setScreen(new dk.mosberg.client.gui.HudConfigScreen());
+                }
             }
         });
 

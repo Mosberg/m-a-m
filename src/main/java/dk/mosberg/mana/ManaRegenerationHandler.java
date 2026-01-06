@@ -30,7 +30,7 @@ public class ManaRegenerationHandler {
         final int syncInterval = Math.max(0, config.manaSyncIntervalTicks);
         final boolean syncEnabled = config.enableManaSyncPackets && syncInterval > 0;
         final int cooldownInterval = Math.max(0, config.cooldownSyncIntervalTicks);
-        final boolean cooldownEnabled = cooldownInterval > 0;
+        final boolean cooldownEnabled = config.enableCooldownSyncPackets && cooldownInterval > 0;
 
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             int currentTick = (int) (server.getOverworld().getTime() % Integer.MAX_VALUE);

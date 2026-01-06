@@ -61,24 +61,25 @@ public class ManaHudOverlay implements HudRenderCallback {
 
     // onHudRender implemented below with cooldown overlay
 
-    private void renderManaBar(DrawContext drawContext, int x, int y, ManaPoolType poolType) {
+    private void renderManaBar(DrawContext drawContext, int x, int y, ManaPoolType poolType,
+            int barWidth, int barHeight) {
         ManaPool pool = ClientManaData.get().getPool(poolType);
         float percentage = pool.getPercentage();
         int color = poolType.getColor();
 
         // Background (dark gray)
-        drawContext.fill(x, y, x + BAR_WIDTH, y + BAR_HEIGHT, 0xFF000000);
+        drawContext.fill(x, y, x + barWidth, y + barHeight, 0xFF000000);
 
         // Border (lighter gray)
-        drawContext.fill(x, y, x + BAR_WIDTH, y + 1, 0xFF555555); // Top
-        drawContext.fill(x, y + BAR_HEIGHT - 1, x + BAR_WIDTH, y + BAR_HEIGHT, 0xFF555555); // Bottom
-        drawContext.fill(x, y, x + 1, y + BAR_HEIGHT, 0xFF555555); // Left
-        drawContext.fill(x + BAR_WIDTH - 1, y, x + BAR_WIDTH, y + BAR_HEIGHT, 0xFF555555); // Right
+        drawContext.fill(x, y, x + barWidth, y + 1, 0xFF555555); // Top
+        drawContext.fill(x, y + barHeight - 1, x + barWidth, y + barHeight, 0xFF555555); // Bottom
+        drawContext.fill(x, y, x + 1, y + barHeight, 0xFF555555); // Left
+        drawContext.fill(x + barWidth - 1, y, x + barWidth, y + barHeight, 0xFF555555); // Right
 
         // Mana fill
-        int fillWidth = (int) ((BAR_WIDTH - 2) * percentage);
+        int fillWidth = (int) ((barWidth - 2) * percentage);
         if (fillWidth > 0) {
-            drawContext.fill(x + 1, y + 1, x + 1 + fillWidth, y + BAR_HEIGHT - 1, color);
+            drawContext.fill(x + 1, y + 1, x + 1 + fillWidth, y + barHeight - 1, color);
         }
 
         // Text label (pool name and values)
@@ -91,7 +92,8 @@ public class ManaHudOverlay implements HudRenderCallback {
         }
     }
 
-    private void renderCooldownOverlay(DrawContext drawContext, int x, int startY) {
+    private void renderCooldownOverlay(DrawContext drawContext, int x, int startY, int barHeight,
+            int barSpacing) {
         var spellId = ClientSelectedCooldown.getCurrentSpellId();
         float remaining = ClientSelectedCooldown.getRemainingSeconds();
         if (spellId == null || remaining <= 0)
@@ -99,7 +101,7 @@ public class ManaHudOverlay implements HudRenderCallback {
 
         String cdText = String.format("CD %s: %.1fs", spellId.getPath(), remaining);
         drawContext.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, cdText, x,
-                startY - 2 * (BAR_HEIGHT + BAR_SPACING) - 12, 0xFFAAAA);
+                startY - 2 * (barHeight + barSpacing) - 12, 0xFFAAAA);
     }
 
     @Override
@@ -114,19 +116,33 @@ public class ManaHudOverlay implements HudRenderCallback {
         int screenWidth = drawContext.getScaledWindowWidth();
         int screenHeight = drawContext.getScaledWindowHeight();
 
+        // Read client HUD config for offsets and scale
+        ClientConfig cfg = ClientConfig.getInstance();
+        // Keep local static state in sync with config (in case settings changed via UI)
+        enabled = cfg.showManaHud;
+        mode = "COMPACT".equalsIgnoreCase(cfg.hudMode) ? HudMode.COMPACT : HudMode.DETAILED;
+        float scale = Math.max(0.5f, Math.min(3.0f, cfg.hudScale));
+        int offsetX = cfg.hudOffsetX;
+        int offsetY = cfg.hudOffsetY;
+
         // Position: Above hotbar, right side
-        int x = screenWidth / 2 + 10;
-        int startY = screenHeight - 49;
+        int x = screenWidth / 2 + 10 + offsetX;
+        int startY = screenHeight - 49 + offsetY;
+
+        int barWidth = Math.max(20, Math.round(BAR_WIDTH * scale));
+        int barHeight = Math.max(6, Math.round(BAR_HEIGHT * scale));
+        int barSpacing = Math.max(1, Math.round(BAR_SPACING * scale));
 
         // Render three mana bars stacked
-        renderManaBar(drawContext, x, startY, ManaPoolType.PERSONAL);
-        renderManaBar(drawContext, x, startY - (BAR_HEIGHT + BAR_SPACING), ManaPoolType.AURA);
-        renderManaBar(drawContext, x, startY - 2 * (BAR_HEIGHT + BAR_SPACING),
-                ManaPoolType.RESERVE);
+        renderManaBar(drawContext, x, startY, ManaPoolType.PERSONAL, barWidth, barHeight);
+        renderManaBar(drawContext, x, startY - (barHeight + barSpacing), ManaPoolType.AURA,
+                barWidth, barHeight);
+        renderManaBar(drawContext, x, startY - 2 * (barHeight + barSpacing), ManaPoolType.RESERVE,
+                barWidth, barHeight);
 
         // Render cooldown overlay in detailed mode only
         if (mode == HudMode.DETAILED) {
-            renderCooldownOverlay(drawContext, x, startY);
+            renderCooldownOverlay(drawContext, x, startY, barHeight, barSpacing);
         }
     }
 }

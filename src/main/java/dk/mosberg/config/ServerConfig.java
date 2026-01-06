@@ -28,6 +28,7 @@ public class ServerConfig {
 
     public boolean enableManaSyncPackets = true;
     public int manaSyncIntervalTicks = 20; // Sync every second
+    public boolean enableCooldownSyncPackets = true; // Toggle cooldown sync packets
     public int cooldownSyncIntervalTicks = 5; // Separate cooldown sync cadence
 
     public static ServerConfig getInstance() {
@@ -63,6 +64,8 @@ public class ServerConfig {
                 Boolean.parseBoolean(props.getProperty("enableManaSyncPackets", "true"));
         config.manaSyncIntervalTicks =
                 Integer.parseInt(props.getProperty("manaSyncIntervalTicks", "20"));
+        config.enableCooldownSyncPackets =
+                Boolean.parseBoolean(props.getProperty("enableCooldownSyncPackets", "true"));
         config.cooldownSyncIntervalTicks =
                 Integer.parseInt(props.getProperty("cooldownSyncIntervalTicks", "5"));
 
@@ -84,6 +87,7 @@ public class ServerConfig {
         props.setProperty("reserveManaRegen", String.valueOf(reserveManaRegen));
         props.setProperty("enableManaSyncPackets", String.valueOf(enableManaSyncPackets));
         props.setProperty("manaSyncIntervalTicks", String.valueOf(manaSyncIntervalTicks));
+        props.setProperty("enableCooldownSyncPackets", String.valueOf(enableCooldownSyncPackets));
         props.setProperty("cooldownSyncIntervalTicks", String.valueOf(cooldownSyncIntervalTicks));
 
         try {

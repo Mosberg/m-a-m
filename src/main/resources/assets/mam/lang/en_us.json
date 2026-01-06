@@ -87,6 +87,8 @@
 
   "key.mam.open_spell_selection": "Open Spell Selection",
   "key.mam.toggle_hud": "Toggle HUD",
+  "key.mam.toggle_hud_mode": "Toggle HUD Mode",
+  "key.mam.open_hud_config": "Open HUD Config",
   "key.mam.cycle_schools": "Cycle Spell Schools",
 
   "hud.mam.mana.personal": "Personal",
