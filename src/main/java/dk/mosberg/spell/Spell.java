@@ -3,6 +3,7 @@ package dk.mosberg.spell;
 import java.util.List;
 import java.util.Optional;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.registry.Registries;
@@ -22,68 +23,54 @@ public class Spell {
     private static final Codec<SpellCastType> CAST_TYPE_CODEC = Codec.STRING.xmap(
             c -> SpellCastType.valueOf(c.toUpperCase()), castType -> castType.name().toLowerCase());
 
-    public static final Codec<Spell> CODEC =
-            RecordCodecBuilder
-                    .create(instance -> instance
-                            .group(Identifier.CODEC.fieldOf("id").forGetter(Spell::getId),
-                                    Codec.STRING.fieldOf("name").forGetter(Spell::getName),
-                                    Codec.STRING.fieldOf("school")
-                                            .forGetter((Spell spell) -> spell.getSchool().name()),
-                                    Codec.STRING
-                                            .optionalFieldOf("description", "")
-                                            .forGetter(Spell::getDescription),
-                                    Codec.STRING
-                                            .fieldOf("castType")
-                                            .forGetter((Spell spell) -> spell.getCastType().name()),
-                                    Codec.FLOAT.fieldOf("manaCost").forGetter(Spell::getManaCost),
-                                    Codec.FLOAT
-                                            .optionalFieldOf("castTime", 1.0f)
-                                            .forGetter(Spell::getCastTime),
-                                    Codec.FLOAT
-                                            .optionalFieldOf("cooldown", 0.0f)
-                                            .forGetter(Spell::getCooldown),
-                                    Codec.INT.fieldOf("tier").forGetter(Spell::getTier),
-                                    Codec.INT.optionalFieldOf("requiredLevel", 1)
-                                            .forGetter(Spell::getRequiredLevel),
-                                    Codec.FLOAT
-                                            .optionalFieldOf("damage", 0.0f)
-                                            .forGetter(Spell::getDamage),
-                                    Codec.FLOAT
-                                            .optionalFieldOf("range", 30.0f)
-                                            .forGetter(Spell::getRange),
-                                    Codec.FLOAT
-                                            .optionalFieldOf("projectileSpeed", 1.0f)
-                                            .forGetter(Spell::getProjectileSpeed),
-                                    Codec.FLOAT.optionalFieldOf("aoeRadius", 0.0f)
-                                            .forGetter(Spell::getAoeRadius),
-                                    Codec.FLOAT
-                                            .optionalFieldOf("knockback", 0.0f)
-                                            .forGetter(Spell::getKnockback),
-                                    Codec.STRING
-                                            .optionalFieldOf("sound", "")
-                                            .forGetter(Spell::getSound),
-                                    VfxData.CODEC
-                                            .optionalFieldOf("vfx")
-                                            .forGetter(Spell::getVfxOptional),
-                                    Codec.STRING
-                                            .listOf().optionalFieldOf("tags", List.of())
-                                            .forGetter(Spell::getTags),
-                                    Codec.STRING.optionalFieldOf("rarity")
-                                            .forGetter(s -> Optional.ofNullable(s.getRarity())
-                                                    .map(Enum::name)),
-                                    Identifier.CODEC
-                                            .optionalFieldOf("parent").forGetter(Spell::getParent),
-                                    AnimationData.CODEC
-                                            .optionalFieldOf("animation")
-                                            .forGetter(Spell::getAnimationOptional))
-                            .apply(instance, (id, name, school, desc, castType, manaCost, castTime,
+    // Bundle trailing fields to stay within the 16-field RecordCodecBuilder limit
+    private record Tail(String sound, Optional<VfxData> vfx, List<String> tags,
+            Optional<String> rarity, Optional<Identifier> parent,
+            Optional<AnimationData> animation) {
+        @SuppressWarnings("null")
+        static final MapCodec<Tail> CODEC = RecordCodecBuilder.mapCodec(instance -> instance
+                .group(Codec.STRING.optionalFieldOf("sound", "").forGetter(Tail::sound),
+                        VfxData.CODEC.optionalFieldOf("vfx").forGetter(Tail::vfx),
+                        Codec.STRING.listOf().optionalFieldOf("tags", List.of())
+                                .forGetter(Tail::tags),
+                        Codec.STRING.optionalFieldOf("rarity").forGetter(Tail::rarity),
+                        Identifier.CODEC.optionalFieldOf("parent").forGetter(Tail::parent),
+                        AnimationData.CODEC.optionalFieldOf("animation").forGetter(Tail::animation))
+                .apply(instance, Tail::new));
+    }
+
+    public static final Codec<Spell> CODEC = RecordCodecBuilder.create(instance -> instance
+            .group(Identifier.CODEC.fieldOf("id").forGetter(Spell::getId),
+                    Codec.STRING.fieldOf("name").forGetter(Spell::getName),
+                    Codec.STRING.fieldOf("school")
+                            .forGetter((Spell spell) -> spell.getSchool().name()),
+                    Codec.STRING.optionalFieldOf("description", "")
+                            .forGetter(Spell::getDescription),
+                    Codec.STRING.fieldOf("castType")
+                            .forGetter((Spell spell) -> spell.getCastType().name()),
+                    Codec.FLOAT.fieldOf("manaCost").forGetter(Spell::getManaCost),
+                    Codec.FLOAT.optionalFieldOf("castTime", 1.0f).forGetter(Spell::getCastTime),
+                    Codec.FLOAT.optionalFieldOf("cooldown", 0.0f).forGetter(Spell::getCooldown),
+                    Codec.INT.fieldOf("tier").forGetter(Spell::getTier),
+                    Codec.INT.optionalFieldOf("requiredLevel", 1)
+                            .forGetter(Spell::getRequiredLevel),
+                    Codec.FLOAT.optionalFieldOf("damage", 0.0f).forGetter(Spell::getDamage),
+                    Codec.FLOAT.optionalFieldOf("range", 30.0f).forGetter(Spell::getRange),
+                    Codec.FLOAT.optionalFieldOf("projectileSpeed", 1.0f)
+                            .forGetter(Spell::getProjectileSpeed),
+                    Codec.FLOAT.optionalFieldOf("aoeRadius", 0.0f).forGetter(Spell::getAoeRadius),
+                    Codec.FLOAT.optionalFieldOf("knockback", 0.0f).forGetter(Spell::getKnockback),
+                    Tail.CODEC.forGetter(spell -> new Tail(spell.getSound(), spell.getVfxOptional(),
+                            spell.getTags(), Optional.ofNullable(spell.getRarity()).map(Enum::name),
+                            spell.getParent(), spell.getAnimationOptional())))
+            .apply(instance,
+                    (id, name, school, desc, castType, manaCost, castTime, cooldown, tier,
+                            requiredLevel, damage, range, projectileSpeed, aoeRadius, knockback,
+                            tail) -> new Spell(id, name, school, desc, castType, manaCost, castTime,
                                     cooldown, tier, requiredLevel, damage, range, projectileSpeed,
-                                    aoeRadius, knockback, sound, vfxOpt, tags, rarityOpt, parentOpt,
-                                    animOpt) -> new Spell(id, name, school, desc, castType,
-                                            manaCost, castTime, cooldown, tier, requiredLevel,
-                                            damage, range, projectileSpeed, aoeRadius, knockback,
-                                            List.of(), java.util.Map.of(), sound, vfxOpt, tags,
-                                            rarityOpt, parentOpt, animOpt)));
+                                    aoeRadius, knockback, List.of(), java.util.Map.of(),
+                                    tail.sound(), tail.vfx(), tail.tags(), tail.rarity(),
+                                    tail.parent(), tail.animation())));
 
     private final Identifier id;
     private final String name;

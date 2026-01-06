@@ -4,7 +4,7 @@ package dk.mosberg.mana;
  * Four mana pool types in the advanced mana system.
  *
  * Features implemented: Pool affinity system, pool conversion mechanics, regional variations.
- * 
+ *
  * TODO: Implement pool linking (shared pools for teams/guilds)
  */
 public enum ManaPoolType {
@@ -245,6 +245,7 @@ public enum ManaPoolType {
                     return 1.1f; // Familiar lands assist precision
                 return 1.0f;
         }
+        return 1.0f;
     }
 
     public float getRegionalDamageModifier(String dimension, boolean isUnderwater) {
@@ -269,6 +270,7 @@ public enum ManaPoolType {
                     return 1.05f;
                 return 1.0f;
         }
+        return 1.0f;
     }
 
     /**
