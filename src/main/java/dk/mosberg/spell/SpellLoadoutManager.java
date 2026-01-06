@@ -35,6 +35,7 @@ public class SpellLoadoutManager {
      * Player-specific loadout data.
      */
     public static class PlayerLoadoutData {
+        @SuppressWarnings("unused")
         private final UUID playerId;
         private final Map<String, SpellLoadout> loadouts = new HashMap<>();
         private String activeLoadoutName;

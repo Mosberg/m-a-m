@@ -129,7 +129,7 @@ public class PlayerCastingData {
 
     /**
      * Attempts to interrupt casting (from damage or movement).
-     * 
+     *
      * @return true if casting was interrupted
      */
     public boolean interruptCasting() {
@@ -190,7 +190,7 @@ public class PlayerCastingData {
 
     /**
      * Checks if backfire should occur (low concentration).
-     * 
+     *
      * @return true if backfire should happen
      */
     public boolean shouldBackfire() {
@@ -542,13 +542,11 @@ public class PlayerCastingData {
      * Represents synergy with another player.
      */
     private static class SynergyEntry {
-        final UUID partnerId;
         SpellSchool lastSchool;
         long lastCastTime;
         int comboCount;
 
         SynergyEntry(UUID partnerId, SpellSchool school, long timestamp) {
-            this.partnerId = partnerId;
             this.lastSchool = school;
             this.lastCastTime = timestamp;
             this.comboCount = 1;

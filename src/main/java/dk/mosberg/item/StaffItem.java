@@ -43,6 +43,7 @@ public class StaffItem extends Item {
         return Math.max(MIN_TIER, Math.min(MAX_TIER, value));
     }
 
+    @SuppressWarnings("unused")
     private int resolveTier(ItemStack stack) {
         Integer stored = stack.get(MAMDataComponents.TIER);
         int resolved = stored != null ? clampTier(stored) : tier;

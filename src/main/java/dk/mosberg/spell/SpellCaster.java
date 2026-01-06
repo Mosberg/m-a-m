@@ -348,9 +348,6 @@ public class SpellCaster {
 
         float synergyBonus = 1.0f;
         for (ServerPlayerEntity nearbyPlayer : nearbyPlayers) {
-            PlayerCastingData nearbyData = nearbyPlayer
-                    .getAttachedOrCreate(ManaAttachments.PLAYER_CASTING, PlayerCastingData::new);
-
             float partnerBonus = castingData.getSynergyBonus(nearbyPlayer.getUuid());
             synergyBonus += partnerBonus;
         }
