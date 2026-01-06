@@ -1,17 +1,26 @@
 package dk.mosberg.client.gui;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
+import dk.mosberg.MAM;
 import dk.mosberg.network.SelectSpellPayload;
 import dk.mosberg.spell.Spell;
 import dk.mosberg.spell.SpellSchool;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -40,6 +49,14 @@ public class SpellSelectionScreen extends Screen {
     private int filterTier = 0;
     private boolean showFavoritesOnly = false;
     private String searchText = "";
+
+    private static final Path FAVORITES_FILE =
+            FabricLoader.getInstance().getConfigDir().resolve("mam-favorites.json");
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+
+    private static class FavoritesConfig {
+        List<String> favorites;
+    }
 
     public enum SortMethod {
         ALPHABETICAL("Name"), DAMAGE("Damage"), MANA_COST("Mana"), COOLDOWN("Cooldown"), RANGE(
@@ -229,12 +246,36 @@ public class SpellSelectionScreen extends Screen {
     }
 
     private void loadFavorites() {
-        // TODO: Load from client-side config file if needed
-        // For now, favorites are session-based
+        if (!Files.exists(FAVORITES_FILE)) {
+            return;
+        }
+        try {
+            String json = Files.readString(FAVORITES_FILE, StandardCharsets.UTF_8);
+            FavoritesConfig cfg = GSON.fromJson(json, FavoritesConfig.class);
+            if (cfg != null && cfg.favorites != null) {
+                favoriteSpells.clear();
+                favoriteSpells.addAll(cfg.favorites);
+                MAM.LOGGER.info("Loaded {} favorite spells from {}", favoriteSpells.size(),
+                        FAVORITES_FILE);
+            }
+        } catch (IOException | JsonSyntaxException e) {
+            MAM.LOGGER.warn("Failed to load favorites from {}: {}", FAVORITES_FILE, e.toString());
+        }
     }
 
     private void saveFavorites() {
-        // TODO: Save to client-side config file if needed
+        try {
+            // Ensure config directory exists
+            Files.createDirectories(FAVORITES_FILE.getParent());
+            FavoritesConfig cfg = new FavoritesConfig();
+            cfg.favorites = new ArrayList<>(favoriteSpells);
+            String json = GSON.toJson(cfg);
+            Files.writeString(FAVORITES_FILE, json, StandardCharsets.UTF_8);
+            MAM.LOGGER.info("Saved {} favorite spells to {}", favoriteSpells.size(),
+                    FAVORITES_FILE);
+        } catch (IOException e) {
+            MAM.LOGGER.warn("Failed to save favorites to {}: {}", FAVORITES_FILE, e.toString());
+        }
     }
 
     @Override
