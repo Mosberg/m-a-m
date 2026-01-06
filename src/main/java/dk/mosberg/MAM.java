@@ -99,6 +99,22 @@ public class MAM implements ModInitializer {
 					RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "spellbook_master"))),
 			4));
 
+	// ═════════════════════════════════════════════════════════════════════════════
+	// Projectile Items (for spell visual rendering)
+	// ═════════════════════════════════════════════════════════════════════════════
+	public static final Item PROJECTILE_FIRE =
+			registerItem("projectile_fire", new Item(new Item.Settings().registryKey(
+					RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "projectile_fire")))));
+	public static final Item PROJECTILE_WATER =
+			registerItem("projectile_water", new Item(new Item.Settings().registryKey(
+					RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "projectile_water")))));
+	public static final Item PROJECTILE_AIR =
+			registerItem("projectile_air", new Item(new Item.Settings().registryKey(
+					RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "projectile_air")))));
+	public static final Item PROJECTILE_EARTH =
+			registerItem("projectile_earth", new Item(new Item.Settings().registryKey(
+					RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "projectile_earth")))));
+
 	@SuppressWarnings("null")
 	@Override
 	public void onInitialize() {

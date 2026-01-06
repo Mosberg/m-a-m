@@ -5,6 +5,7 @@ import dk.mosberg.spell.Spell;
 import dk.mosberg.spell.SpellSchool;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.FlyingItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
@@ -12,6 +13,7 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
+import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.storage.ReadView;
@@ -23,11 +25,14 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 /**
- * Custom projectile entity for spell casting.
+ * Custom projectile entity for spell casting. Implements FlyingItemEntity to support proper
+ * rendering with ItemStack visuals.
  */
-public class SpellProjectileEntity extends ProjectileEntity {
+public class SpellProjectileEntity extends ProjectileEntity implements FlyingItemEntity {
     private static final TrackedData<Byte> SCHOOL_TRACKER =
             DataTracker.registerData(SpellProjectileEntity.class, TrackedDataHandlerRegistry.BYTE);
+    private static final TrackedData<ItemStack> ITEM = DataTracker
+            .registerData(SpellProjectileEntity.class, TrackedDataHandlerRegistry.ITEM_STACK);
 
     private SpellSchool school = SpellSchool.FIRE;
     private float damage = 2.0f;
@@ -62,12 +67,34 @@ public class SpellProjectileEntity extends ProjectileEntity {
 
     @Override
     protected void initDataTracker(DataTracker.Builder builder) {
-        builder.add(SCHOOL_TRACKER, (byte) school.ordinal());
+        // Use safe defaults here; subclass fields are not initialized yet during super constructor
+        builder.add(SCHOOL_TRACKER, (byte) SpellSchool.FIRE.ordinal());
+        builder.add(ITEM, new ItemStack(MAM.PROJECTILE_FIRE));
+    }
+
+    private ItemStack getDefaultItemStack() {
+        // Return the appropriate projectile item based on school
+        return new ItemStack(switch (school) {
+            case FIRE -> MAM.PROJECTILE_FIRE;
+            case WATER -> MAM.PROJECTILE_WATER;
+            case AIR -> MAM.PROJECTILE_AIR;
+            case EARTH -> MAM.PROJECTILE_EARTH;
+        });
+    }
+
+    @Override
+    public ItemStack getStack() {
+        return this.getDataTracker().get(ITEM);
+    }
+
+    private void updateItemStack() {
+        this.getDataTracker().set(ITEM, getDefaultItemStack());
     }
 
     private void setSchool(SpellSchool school) {
         this.school = school;
         this.getDataTracker().set(SCHOOL_TRACKER, (byte) school.ordinal());
+        updateItemStack();
     }
 
     public SpellSchool getSchool() {
@@ -157,6 +184,7 @@ public class SpellProjectileEntity extends ProjectileEntity {
 
     @Override
     protected void writeCustomData(WriteView view) {
+        super.writeCustomData(view);
         view.putString("School", school.name());
         view.putFloat("Damage", damage);
         view.putFloat("Knockback", knockback);
@@ -165,6 +193,7 @@ public class SpellProjectileEntity extends ProjectileEntity {
 
     @Override
     protected void readCustomData(ReadView view) {
+        super.readCustomData(view);
         String schoolName = view.getString("School", SpellSchool.FIRE.name());
         try {
             setSchool(SpellSchool.valueOf(schoolName));

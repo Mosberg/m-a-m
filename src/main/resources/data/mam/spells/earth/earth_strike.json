@@ -1,7 +1,7 @@
 {
   "id": "mam:earth_strike",
   "name": "Earth Strike",
-  "school": "water",
+  "school": "earth",
   "description": "A stone projectile that hits enemies, dealing moderate damage and stunning them temporarily.",
   "castType": "projectile",
   "manaCost": 13.0,
@@ -21,7 +21,7 @@
   "sound": "block.stone.break",
   "vfx": {
     "particleType": "block",
-	"particleCount": 50,
+    "particleCount": 50,
     "color": "696969"
   }
 }
