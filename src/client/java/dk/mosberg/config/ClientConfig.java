@@ -31,6 +31,7 @@ public class ClientConfig {
     public int hudOffsetX = 0;
     public int hudOffsetY = 0;
     public float hudScale = 1.0f;
+    public String hudMode = "DETAILED"; // DETAILED or COMPACT
 
     public static ClientConfig getInstance() {
         if (INSTANCE == null) {
@@ -46,7 +47,13 @@ public class ClientConfig {
                 String json = Files.readString(CONFIG_PATH);
                 ClientConfig config = GSON.fromJson(json, ClientConfig.class);
                 MAM.LOGGER.info("Loaded client config from {}", CONFIG_PATH);
-                return config != null ? config : new ClientConfig();
+                if (config == null)
+                    config = new ClientConfig();
+                // Backfill defaults for new fields
+                if (config.hudMode == null || config.hudMode.isBlank()) {
+                    config.hudMode = "DETAILED";
+                }
+                return config;
             } catch (IOException e) {
                 MAM.LOGGER.error("Failed to load client config", e);
             }

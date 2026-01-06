@@ -28,6 +28,7 @@ public class ServerConfig {
 
     public boolean enableManaSyncPackets = true;
     public int manaSyncIntervalTicks = 20; // Sync every second
+    public int cooldownSyncIntervalTicks = 5; // Separate cooldown sync cadence
 
     public static ServerConfig getInstance() {
         if (INSTANCE == null) {
@@ -62,6 +63,8 @@ public class ServerConfig {
                 Boolean.parseBoolean(props.getProperty("enableManaSyncPackets", "true"));
         config.manaSyncIntervalTicks =
                 Integer.parseInt(props.getProperty("manaSyncIntervalTicks", "20"));
+        config.cooldownSyncIntervalTicks =
+                Integer.parseInt(props.getProperty("cooldownSyncIntervalTicks", "5"));
 
         // Save if file didn't exist
         if (!Files.exists(CONFIG_PATH)) {
@@ -81,6 +84,7 @@ public class ServerConfig {
         props.setProperty("reserveManaRegen", String.valueOf(reserveManaRegen));
         props.setProperty("enableManaSyncPackets", String.valueOf(enableManaSyncPackets));
         props.setProperty("manaSyncIntervalTicks", String.valueOf(manaSyncIntervalTicks));
+        props.setProperty("cooldownSyncIntervalTicks", String.valueOf(cooldownSyncIntervalTicks));
 
         try {
             Files.createDirectories(CONFIG_PATH.getParent());

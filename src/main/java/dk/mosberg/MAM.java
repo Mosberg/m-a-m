@@ -13,6 +13,7 @@ import dk.mosberg.network.CastSpellPayload;
 import dk.mosberg.network.ManaSyncPayload;
 import dk.mosberg.network.OpenSpellBookPayload;
 import dk.mosberg.network.SelectSpellPayload;
+import dk.mosberg.network.SelectedCooldownPayload;
 import dk.mosberg.network.ServerNetworkHandler;
 import dk.mosberg.spell.CastTypeAnimationRegistry;
 import dk.mosberg.spell.HybridSchoolRegistry;
@@ -150,6 +151,7 @@ public class MAM implements ModInitializer {
 		ManaSyncPayload.register();
 		SelectSpellPayload.register();
 		OpenSpellBookPayload.register();
+		SelectedCooldownPayload.register();
 		ServerNetworkHandler.register();
 
 		// Load server config

@@ -82,6 +82,9 @@ public class SpellCaster {
 
         // Start cooldown for this spell
         castingData.getCooldownTracker().startCooldown(spell.getId(), spell.getCooldown(), null);
+        // Sync selected cooldown to client for HUD visualization
+        float remaining = castingData.getCooldownTracker().getRemainingCooldown(spell.getId());
+        ServerNetworkHandler.syncSelectedCooldownToClient(player, spell.getId(), remaining);
 
         // Start casting state
         if (!castingData.startCasting(spell.getId())) {

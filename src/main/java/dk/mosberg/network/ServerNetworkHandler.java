@@ -70,14 +70,23 @@ public class ServerNetworkHandler {
 
         PlayerManaData manaData = castingData.getManaData();
 
-        ManaSyncPayload payload =
-                new ManaSyncPayload(manaData.getPool(ManaPoolType.PERSONAL).getCurrentMana(),
-                        manaData.getPool(ManaPoolType.PERSONAL).getMaxCapacity(),
-                        manaData.getPool(ManaPoolType.AURA).getCurrentMana(),
-                        manaData.getPool(ManaPoolType.AURA).getMaxCapacity(),
-                        manaData.getPool(ManaPoolType.RESERVE).getCurrentMana(),
-                        manaData.getPool(ManaPoolType.RESERVE).getMaxCapacity(),
-                        manaData.getActivePriority().name());
+        // Compute effective regen rates (server-authoritative) for display
+        float eff = manaData.getEfficiencyModifier();
+        float personalRegen = manaData.getPool(ManaPoolType.PERSONAL).getRegenRate()
+                * (1f - manaData.getDrainEffect(ManaPoolType.PERSONAL)) * eff;
+        float auraRegen = manaData.getPool(ManaPoolType.AURA).getRegenRate()
+                * (1f - manaData.getDrainEffect(ManaPoolType.AURA)) * eff;
+        float reserveRegen = manaData.getPool(ManaPoolType.RESERVE).getRegenRate()
+                * (1f - manaData.getDrainEffect(ManaPoolType.RESERVE)) * eff;
+
+        ManaSyncPayload payload = new ManaSyncPayload(
+                manaData.getPool(ManaPoolType.PERSONAL).getCurrentMana(),
+                manaData.getPool(ManaPoolType.PERSONAL).getMaxCapacity(),
+                manaData.getPool(ManaPoolType.AURA).getCurrentMana(),
+                manaData.getPool(ManaPoolType.AURA).getMaxCapacity(),
+                manaData.getPool(ManaPoolType.RESERVE).getCurrentMana(),
+                manaData.getPool(ManaPoolType.RESERVE).getMaxCapacity(),
+                manaData.getActivePriority().name(), personalRegen, auraRegen, reserveRegen);
 
         ServerPlayNetworking.send(player, payload);
     }
@@ -99,5 +108,15 @@ public class ServerNetworkHandler {
             }
         }
         return ItemStack.EMPTY;
+    }
+
+    /**
+     * Sends selected spell cooldown info to a client.
+     */
+    public static void syncSelectedCooldownToClient(
+            net.minecraft.server.network.ServerPlayerEntity player,
+            net.minecraft.util.Identifier spellId, float remainingSeconds) {
+        SelectedCooldownPayload payload = new SelectedCooldownPayload(spellId, remainingSeconds);
+        ServerPlayNetworking.send(player, payload);
     }
 }

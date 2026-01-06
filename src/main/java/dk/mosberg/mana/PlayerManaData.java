@@ -42,6 +42,9 @@ public class PlayerManaData {
         pools.put(ManaPoolType.AURA, new ManaPool(config.auraManaCapacity, config.auraManaRegen));
         pools.put(ManaPoolType.RESERVE,
                 new ManaPool(config.reserveManaCapacity, config.reserveManaRegen));
+        // Initialize SKILL pool using enum defaults (not configured in ServerConfig)
+        pools.put(ManaPoolType.SKILL, new ManaPool(ManaPoolType.SKILL.getDefaultCapacity(),
+                ManaPoolType.SKILL.getDefaultRegenRate()));
 
         // Initialize advanced mechanics state
         for (ManaPoolType type : ManaPoolType.values()) {
@@ -417,6 +420,13 @@ public class PlayerManaData {
                     float regen = poolNbt.getFloat("regen").get();
                     pools.put(type, new ManaPool(max, current, regen));
                 }
+            }
+        }
+        // Ensure all pools exist even if absent in NBT (e.g., new pool types)
+        for (ManaPoolType type : ManaPoolType.values()) {
+            if (!pools.containsKey(type)) {
+                pools.put(type,
+                        new ManaPool(type.getDefaultCapacity(), type.getDefaultRegenRate()));
             }
         }
         if (nbt.contains("activePriority")) {

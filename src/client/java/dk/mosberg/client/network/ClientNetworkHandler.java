@@ -4,6 +4,7 @@ import dk.mosberg.MAM;
 import dk.mosberg.client.gui.SpellScreenHelper;
 import dk.mosberg.network.ManaSyncPayload;
 import dk.mosberg.network.OpenSpellBookPayload;
+import dk.mosberg.network.SelectedCooldownPayload;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 /**
@@ -24,9 +25,19 @@ public class ClientNetworkHandler {
             context.client().execute(() -> {
                 ClientManaData.updateFromServer(payload.personalMana(), payload.personalMax(),
                         payload.auraMana(), payload.auraMax(), payload.reserveMana(),
-                        payload.reserveMax(), payload.activePriority());
+                        payload.reserveMax(), payload.activePriority(), payload.personalRegen(),
+                        payload.auraRegen(), payload.reserveRegen());
             });
         });
+
+        // Handle selected spell cooldown sync
+        ClientPlayNetworking.registerGlobalReceiver(SelectedCooldownPayload.ID,
+                (payload, context) -> {
+                    context.client().execute(() -> {
+                        ClientSelectedCooldown.update(payload.spellId(),
+                                payload.remainingSeconds());
+                    });
+                });
 
         // Handle spellbook opening from server
         ClientPlayNetworking.registerGlobalReceiver(OpenSpellBookPayload.ID, (payload, context) -> {

@@ -19,7 +19,8 @@ import net.minecraft.util.Identifier;
  * modifying mana currently) TODO: Include prediction delta (server estimated mana next tick)
  */
 public record ManaSyncPayload(float personalMana, float personalMax, float auraMana, float auraMax,
-        float reserveMana, float reserveMax, String activePriority) implements CustomPayload {
+        float reserveMana, float reserveMax, String activePriority, float personalRegen,
+        float auraRegen, float reserveRegen) implements CustomPayload {
 
     public static final CustomPayload.Id<ManaSyncPayload> ID =
             new CustomPayload.Id<>(Identifier.of(MAM.MOD_ID, "mana_sync"));
@@ -30,7 +31,9 @@ public record ManaSyncPayload(float personalMana, float personalMax, float auraM
                     ManaSyncPayload::personalMax, PacketCodecs.FLOAT, ManaSyncPayload::auraMana,
                     PacketCodecs.FLOAT, ManaSyncPayload::auraMax, PacketCodecs.FLOAT,
                     ManaSyncPayload::reserveMana, PacketCodecs.FLOAT, ManaSyncPayload::reserveMax,
-                    PacketCodecs.STRING, ManaSyncPayload::activePriority, ManaSyncPayload::new);
+                    PacketCodecs.STRING, ManaSyncPayload::activePriority, PacketCodecs.FLOAT,
+                    ManaSyncPayload::personalRegen, PacketCodecs.FLOAT, ManaSyncPayload::auraRegen,
+                    PacketCodecs.FLOAT, ManaSyncPayload::reserveRegen, ManaSyncPayload::new);
 
     @Override
     public @NotNull Id<? extends CustomPayload> getId() {

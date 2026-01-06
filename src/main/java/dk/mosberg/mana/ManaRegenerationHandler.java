@@ -3,6 +3,7 @@ package dk.mosberg.mana;
 import java.util.Objects;
 import dk.mosberg.MAM;
 import dk.mosberg.config.ServerConfig;
+import dk.mosberg.item.SpellbookItem;
 import dk.mosberg.network.ServerNetworkHandler;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -28,6 +29,8 @@ public class ManaRegenerationHandler {
 
         final int syncInterval = Math.max(0, config.manaSyncIntervalTicks);
         final boolean syncEnabled = config.enableManaSyncPackets && syncInterval > 0;
+        final int cooldownInterval = Math.max(0, config.cooldownSyncIntervalTicks);
+        final boolean cooldownEnabled = cooldownInterval > 0;
 
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             int currentTick = (int) (server.getOverworld().getTime() % Integer.MAX_VALUE);
@@ -46,6 +49,16 @@ public class ManaRegenerationHandler {
 
                 if (syncEnabled && currentTick % syncInterval == 0) {
                     ServerNetworkHandler.syncManaToClient(player);
+                }
+
+                if (cooldownEnabled && currentTick % cooldownInterval == 0) {
+                    var selectedSpell = getSelectedSpellId(player);
+                    if (selectedSpell != null) {
+                        float remaining = castingData.getCooldownTracker()
+                                .getRemainingCooldown(selectedSpell);
+                        ServerNetworkHandler.syncSelectedCooldownToClient(player, selectedSpell,
+                                remaining);
+                    }
                 }
             }
         });
@@ -97,5 +110,29 @@ public class ManaRegenerationHandler {
 
         // Apply the calculated modifier
         manaData.setEfficiencyModifier(efficiencyModifier);
+    }
+
+    /**
+     * Gets the selected spell Identifier from the player's spellbook, if any.
+     */
+    private static net.minecraft.util.Identifier getSelectedSpellId(ServerPlayerEntity player) {
+        // Check main hand then offhand
+        var main = player.getMainHandStack();
+        if (main.getItem() instanceof SpellbookItem) {
+            return SpellbookItem.getSelectedSpell(main);
+        }
+        var off = player.getOffHandStack();
+        if (off.getItem() instanceof SpellbookItem) {
+            return SpellbookItem.getSelectedSpell(off);
+        }
+        // Search inventory as fallback
+        var inv = player.getInventory();
+        for (int i = 0; i < inv.size(); i++) {
+            var stack = inv.getStack(i);
+            if (stack.getItem() instanceof SpellbookItem) {
+                return SpellbookItem.getSelectedSpell(stack);
+            }
+        }
+        return null;
     }
 }

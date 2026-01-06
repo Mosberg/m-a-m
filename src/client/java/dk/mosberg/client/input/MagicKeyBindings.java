@@ -22,6 +22,7 @@ import net.minecraft.text.Text;
 public class MagicKeyBindings {
     private static net.minecraft.client.option.KeyBinding openSpellKey;
     private static net.minecraft.client.option.KeyBinding toggleHudKey;
+    private static net.minecraft.client.option.KeyBinding toggleHudModeKey;
 
     /**
      * Register client event handlers.
@@ -40,6 +41,12 @@ public class MagicKeyBindings {
                         org.lwjgl.glfw.GLFW.GLFW_KEY_H,
                         net.minecraft.client.option.KeyBinding.Category.MISC));
 
+        toggleHudModeKey = net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
+                .registerKeyBinding(new net.minecraft.client.option.KeyBinding(
+                        "key.mam.toggle_hud_mode", net.minecraft.client.util.InputUtil.Type.KEYSYM,
+                        org.lwjgl.glfw.GLFW.GLFW_KEY_J,
+                        net.minecraft.client.option.KeyBinding.Category.MISC));
+
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (openSpellKey.wasPressed()) {
                 openSpellSelectionScreen(client);
@@ -47,6 +54,10 @@ public class MagicKeyBindings {
 
             while (toggleHudKey.wasPressed()) {
                 toggleHUD();
+            }
+
+            while (toggleHudModeKey.wasPressed()) {
+                dk.mosberg.client.hud.ManaHudOverlay.cycleMode();
             }
         });
 
