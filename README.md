@@ -1,4 +1,4 @@
-# Mana And Magic
+# ✨ Mana And Magic
 
 #### A data-driven magic mod for Minecraft 1.21.11 (Fabric)
 
