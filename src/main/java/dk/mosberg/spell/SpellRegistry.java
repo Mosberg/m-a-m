@@ -25,6 +25,14 @@ import net.minecraft.util.Identifier;
 
 /**
  * Registry for spells loaded from data packs.
+ *
+ * TODO: Implement spell validation on load (check required fields) TODO: Add spell compatibility
+ * checking (version, dependencies) TODO: Implement hot-reload for spells during development TODO:
+ * Add spell inheritance/templates system TODO: Implement spell balancing presets (easy, normal,
+ * hard) TODO: Add spell tag system for categorization and filtering TODO: Implement spell
+ * compression for network transfer TODO: Add spell dependency resolution (spells requiring other
+ * spells) TODO: Implement spell variant/modification system TODO: Add spell versioning and
+ * migration system
  */
 public class SpellRegistry {
     private static final Map<Identifier, Spell> SPELLS = new HashMap<>();
@@ -85,11 +93,14 @@ public class SpellRegistry {
                         error -> MAM.LOGGER.error("Failed to parse spell {}: {}", spellId, error))
                         .orElse(null);
 
-                if (spell != null) {
+                if (spell != null && validateSpell(spell)) {
                     SPELLS.put(spell.getId(), spell);
                     loaded++;
                     MAM.LOGGER.debug("Loaded spell: {}", spell.getId());
                 } else {
+                    if (spell != null) {
+                        MAM.LOGGER.error("Spell {} failed validation", spellId);
+                    }
                     failed++;
                 }
             } catch (Exception e) {
@@ -148,5 +159,165 @@ public class SpellRegistry {
         cachedMaxTier = maxTier;
         cachedMaxTierList = result;
         return result;
+    }
+
+    /**
+     * Get spells filtered by tags.
+     *
+     * @param tag Tag to filter by
+     * @return List of spells with the specified tag
+     */
+    public static List<Spell> getSpellsByTag(String tag) {
+        return SPELLS.values().stream().filter(spell -> spell.getTags().contains(tag))
+                .sorted(Comparator.comparingInt(Spell::getTier)).toList();
+    }
+
+    /**
+     * Get spells filtered by multiple tags (must have all tags).
+     *
+     * @param tags Tags to filter by
+     * @return List of spells with all specified tags
+     */
+    public static List<Spell> getSpellsByTags(List<String> tags) {
+        return SPELLS.values().stream().filter(spell -> spell.getTags().containsAll(tags))
+                .sorted(Comparator.comparingInt(Spell::getTier)).toList();
+    }
+
+    /**
+     * Get spells by cast type.
+     *
+     * @param castType Cast type to filter by
+     * @return List of spells with the specified cast type
+     */
+    public static List<Spell> getSpellsByCastType(SpellCastType castType) {
+        return SPELLS.values().stream().filter(spell -> spell.getCastType() == castType)
+                .sorted(Comparator.comparingInt(Spell::getTier)).toList();
+    }
+
+    /**
+     * Validate spell data for required fields and reasonable values.
+     *
+     * @param spell Spell to validate
+     * @return true if spell passes validation
+     */
+    private static boolean validateSpell(Spell spell) {
+        // Check required fields
+        if (spell.getId() == null) {
+            MAM.LOGGER.error("Spell missing ID");
+            return false;
+        }
+        if (spell.getName() == null || spell.getName().isEmpty()) {
+            MAM.LOGGER.error("Spell {} missing name", spell.getId());
+            return false;
+        }
+        if (spell.getSchool() == null) {
+            MAM.LOGGER.error("Spell {} missing school", spell.getId());
+            return false;
+        }
+        if (spell.getCastType() == null) {
+            MAM.LOGGER.error("Spell {} missing cast type", spell.getId());
+            return false;
+        }
+
+        // Check reasonable value ranges
+        if (spell.getManaCost() < 0) {
+            MAM.LOGGER.error("Spell {} has negative mana cost: {}", spell.getId(),
+                    spell.getManaCost());
+            return false;
+        }
+        if (spell.getTier() < 1 || spell.getTier() > 4) {
+            MAM.LOGGER.error("Spell {} has invalid tier: {} (must be 1-4)", spell.getId(),
+                    spell.getTier());
+            return false;
+        }
+        if (spell.getCooldown() < 0) {
+            MAM.LOGGER.error("Spell {} has negative cooldown: {}", spell.getId(),
+                    spell.getCooldown());
+            return false;
+        }
+        if (spell.getDamage() < 0) {
+            MAM.LOGGER.error("Spell {} has negative damage: {}", spell.getId(), spell.getDamage());
+            return false;
+        }
+        if (spell.getRange() <= 0) {
+            MAM.LOGGER.error("Spell {} has invalid range: {}", spell.getId(), spell.getRange());
+            return false;
+        }
+
+        MAM.LOGGER.debug("Spell {} passed validation", spell.getId());
+        return true;
+    }
+
+    /**
+     * Check if a spell's dependencies are met (prerequisite spells exist). Dependencies are
+     * specified in spell tags prefixed with "requires:". Example: ["offensive",
+     * "requires:fire_bolt"]
+     *
+     * @param spell Spell to check dependencies for
+     * @return true if all dependencies are met
+     */
+    public static boolean checkSpellDependencies(Spell spell) {
+        for (String tag : spell.getTags()) {
+            if (tag.startsWith("requires:")) {
+                String requiredSpellName = tag.substring("requires:".length());
+                Identifier requiredSpellId =
+                        Identifier.of(spell.getId().getNamespace(), requiredSpellName);
+
+                if (!SPELLS.containsKey(requiredSpellId)) {
+                    MAM.LOGGER.warn("Spell {} has unmet dependency: {}", spell.getId(),
+                            requiredSpellId);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Get all spells that depend on the specified spell.
+     *
+     * @param spellId Spell identifier
+     * @return List of spells that require this spell
+     */
+    public static List<Spell> getSpellDependents(Identifier spellId) {
+        String dependencyTag = "requires:" + spellId.getPath();
+        return SPELLS.values().stream().filter(spell -> spell.getTags().contains(dependencyTag))
+                .sorted(Comparator.comparingInt(Spell::getTier)).toList();
+    }
+
+    /**
+     * Check if a player has access to a spell based on dependencies. This method checks if all
+     * prerequisite spells are in the known spells list.
+     *
+     * @param spell Spell to check
+     * @param knownSpells List of spell IDs the player has learned
+     * @return true if player can access this spell
+     */
+    public static boolean canAccessSpell(Spell spell, List<Identifier> knownSpells) {
+        for (String tag : spell.getTags()) {
+            if (tag.startsWith("requires:")) {
+                String requiredSpellName = tag.substring("requires:".length());
+                Identifier requiredSpellId =
+                        Identifier.of(spell.getId().getNamespace(), requiredSpellName);
+
+                if (!knownSpells.contains(requiredSpellId)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Get all spells accessible with the given known spells and tier limit.
+     *
+     * @param knownSpells List of spell IDs the player has learned
+     * @param maxTier Maximum tier the player can access
+     * @return List of spells available to the player
+     */
+    public static List<Spell> getAccessibleSpells(List<Identifier> knownSpells, int maxTier) {
+        return SPELLS.values().stream().filter(spell -> spell.getTier() <= maxTier)
+                .filter(spell -> canAccessSpell(spell, knownSpells))
+                .sorted(Comparator.comparingInt(Spell::getTier)).toList();
     }
 }

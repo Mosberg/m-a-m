@@ -8,6 +8,15 @@ import net.minecraft.nbt.NbtCompound;
 
 /**
  * Holds the three-pool mana system data for a player.
+ *
+ * TODO: Implement mana pool overflow mechanic (cap excess, redirect to other pools) TODO: Add mana
+ * drain effects (applied by spells/items, reduces regen temporarily) TODO: Implement mana shield
+ * system (absorbs damage instead of health) TODO: Add restoration mechanics (potions, items,
+ * passive abilities) TODO: Implement mana sharing/transfer between players (coop mechanics) TODO:
+ * Add pool burnout penalty (too much casting from one pool reduces stats) TODO: Implement mana
+ * burst mode (temporary high consumption, high output) TODO: Add synchronization events to notify
+ * clients of mana changes TODO: Implement mana debt system (temporarily borrow from future regen)
+ * TODO: Add mana efficiency modifiers per player (from equipment/buffs)
  */
 public class PlayerManaData {
     @SuppressWarnings("null")

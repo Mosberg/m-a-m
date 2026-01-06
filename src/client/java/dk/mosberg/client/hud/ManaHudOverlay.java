@@ -11,6 +11,15 @@ import net.minecraft.client.render.RenderTickCounter;
 
 /**
  * Renders the three-tier mana bars in the HUD.
+ *
+ * TODO: Add HUD customization settings (position, size, transparency, color themes) TODO: Implement
+ * mana bar animations (drain pulse, regen glow, critical warning blink) TODO: Add spell cooldown
+ * indicators overlay on HUD TODO: Implement status effect icons display on mana bars TODO: Add mana
+ * regeneration rate display (per tick/second) TODO: Create mana threshold warnings (critical low,
+ * etc.) with visual/audio cues TODO: Add alternative HUD layout modes
+ * (vertical/horizontal/compact/detailed) TODO: Implement screen shake effect when mana depleted or
+ * critical TODO: Add floating combat text for mana drain/regen events TODO: Implement HUD scaling
+ * based on mana pool tier (visual emphasis)
  */
 @SuppressWarnings("deprecation")
 public class ManaHudOverlay implements HudRenderCallback {

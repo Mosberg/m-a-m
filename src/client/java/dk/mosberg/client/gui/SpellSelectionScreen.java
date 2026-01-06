@@ -417,4 +417,16 @@ public class SpellSelectionScreen extends Screen {
     public boolean shouldPause() {
         return false;
     }
+
+    // TODO: Add search bar for spell filtering
+    // TODO: Add drag-and-drop spell ordering
+    // TODO: Add spell comparison tool
+    // TODO: Add spell requirement validation display
+    // TODO: Add spell preview animation
+    // TODO: Add spell deck/loadout management
+    // TODO: Add custom spell categories
+    // TODO: Add spell synergy recommendations
+    // TODO: Add spell economy display (cost/benefit)
+    // TODO: Add spell learning/progression indicators
+    // TODO: Add spell unlocking mechanics
 }

@@ -11,6 +11,13 @@ import net.minecraft.util.Identifier;
 
 /**
  * Custom data components for mod items.
+ *
+ * TODO: Add MANA_EFFICIENCY component for staff/spellbook enchantments TODO: Add SPELL_POWER
+ * component for damage/range modifiers TODO: Add COOLDOWN_REDUCTION component for faster spell
+ * casting TODO: Add FAVORITE_SPELLS component for multiple favorites storage TODO: Add CAST_COUNT
+ * component for tracking usage stats TODO: Add EXPERIENCE component for spell progression/leveling
+ * TODO: Add CUSTOM_NAME component for weapon naming customization TODO: Add ATTUNEMENT component
+ * for school affinity tracking TODO: Add ENCHANTMENT_LEVEL component for tiered enchantments
  */
 public class MAMDataComponents {
 

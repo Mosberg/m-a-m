@@ -51,6 +51,16 @@ public class MagicKeyBindings {
         });
 
         MAM.LOGGER.info("Registered client keybindings");
+
+        // TODO: Add custom keybinding configuration file
+        // TODO: Add spell quick-cast keybindings (1-9)
+        // TODO: Add stance/form switching keybindings
+        // TODO: Add spell hotbar keybindings
+        // TODO: Add ability to modify keybindings in-game
+        // TODO: Add keybinding conflict detection
+        // TODO: Add mouse button support for keybindings
+        // TODO: Add gamepad/controller support
+        // TODO: Add keybinding profiles for different scenarios
     }
 
     /**

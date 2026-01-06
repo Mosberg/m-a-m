@@ -13,6 +13,12 @@ import net.minecraft.text.Text;
 
 /**
  * Registers rich item tooltips for client-side display.
+ *
+ * TODO: Add damage/range/cooldown tooltip details TODO: Implement comparison mode (showing
+ * differences from held item) TODO: Add enchantment information display TODO: Implement stat
+ * breakdown (base + modifiers) TODO: Add requirement indicators (level, stats, etc.) TODO:
+ * Implement animated tooltip content (for dynamic values) TODO: Add rarity coloring and border
+ * effects TODO: Implement tooltip sound effects TODO: Add custom formatting per school
  */
 public final class ItemTooltips {
     private ItemTooltips() {}

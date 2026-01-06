@@ -7,6 +7,15 @@ import net.minecraft.nbt.NbtCompound;
 /**
  * Combines mana and cooldown tracking into a single player attachment. This is the main data holder
  * for all casting-related mechanics.
+ *
+ * TODO: Add casting state tracking (idle, channeling, casting, cooldown phases) TODO: Implement
+ * interrupt mechanics (damage/movement breaks channeling) TODO: Add concentration system (tracking
+ * focus level for spell accuracy/power) TODO: Implement casting speed modifiers (haste/slowness
+ * effects) TODO: Add backfire/critical failure mechanics for low concentration TODO: Implement
+ * combo system tracking (consecutive similar spells) TODO: Add rhythm-based casting (timed button
+ * presses for bonuses) TODO: Implement spell memory system (memorized spells for quick access)
+ * TODO: Add fatigue system (too much casting reduces effectiveness) TODO: Implement synergy
+ * tracking (combining elements with other players)
  */
 public class PlayerCastingData {
     private final PlayerManaData manaData;

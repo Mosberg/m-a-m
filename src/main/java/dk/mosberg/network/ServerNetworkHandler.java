@@ -13,6 +13,13 @@ import net.minecraft.item.ItemStack;
 
 /**
  * Registers server-side packet handlers.
+ *
+ * TODO: Implement server-side spell validation (check player permissions/tier) TODO: Add anti-cheat
+ * verification for spell parameters TODO: Implement lag compensation for spell targeting TODO: Add
+ * batch packet handling for multi-spell sequences TODO: Implement connection rate limiting for
+ * rapid spell casts TODO: Add player state tracking (casting, channeling, cooldown) TODO: Implement
+ * spell log recording for replay/moderation TODO: Add cross-server spell sync for multiplayer
+ * worlds TODO: Implement client-side prediction rollback on failure
  */
 public class ServerNetworkHandler {
 

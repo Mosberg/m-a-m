@@ -45,4 +45,15 @@ public class ManaRegenerationHandler {
 
         MAM.LOGGER.info("Registered mana regeneration and cooldown handler");
     }
+
+    // TODO: Add conditional mana regen modifiers (meditation, environment)
+    // TODO: Add mana drain/steal mechanics
+    // TODO: Add mana shield mechanics
+    // TODO: Add mana pool depletion penalties
+    // TODO: Add mana burst/overflow mechanics
+    // TODO: Add mana restoration items/potions
+    // TODO: Add mana sharing/transfer mechanics
+    // TODO: Add mana visibility/detection system
+    // TODO: Add mana-based buffs/debuffs
+    // TODO: Add mana scaling for difficulty modes
 }

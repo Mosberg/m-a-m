@@ -11,6 +11,13 @@ import net.minecraft.util.Identifier;
 
 /**
  * Registry for custom entities.
+ *
+ * TODO: Add SPELL_AURA entity type (visual effect area, damage over time) TODO: Add
+ * SUMMONED_FAMILIAR entity type (AI-controlled helper creature) TODO: Add SPELL_TRAP entity type
+ * (triggered trap mechanism) TODO: Add BUFF_ORB entity type (floating pickup for mana/buffs) TODO:
+ * Add EXPLOSION_EFFECT entity type (custom explosion with school effects) TODO: Implement entity
+ * collision settings per entity type TODO: Add pathfinding for summoned creatures TODO: Implement
+ * AI behavior trees for spell-summoned entities TODO: Add entity data serialization for persistence
  */
 public class MAMEntities {
 

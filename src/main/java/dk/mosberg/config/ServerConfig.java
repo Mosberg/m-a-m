@@ -100,4 +100,18 @@ public class ServerConfig {
         INSTANCE = load();
         MAM.LOGGER.info("Reloaded server config");
     }
+
+    // TODO: Add spell damage scaling configuration
+    // TODO: Add spell cooldown global multiplier
+    // TODO: Add mana cost scaling configuration
+    // TODO: Add spell availability restrictions by tier/level
+    // TODO: Add PvP/PvE damage multiplier configuration
+    // TODO: Add spell casting speed multiplier
+    // TODO: Add projectile speed configuration
+    // TODO: Add AOE radius scaling configuration
+    // TODO: Add spell effect duration scaling
+    // TODO: Add difficulty-based spell modifications
+    // TODO: Add spell disable/whitelist configuration
+    // TODO: Add world region spell restrictions
+    // TODO: Add permission-based spell access
 }

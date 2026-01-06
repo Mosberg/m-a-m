@@ -13,6 +13,15 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 
 @SuppressWarnings("deprecation")
 public class MAMClient implements ClientModInitializer {
+	/**
+	 * Client initialization entry point.
+	 *
+	 * TODO: Register block entity renderers for magic-infused blocks TODO: Implement particle
+	 * system initialization TODO: Register custom screen handlers TODO: Add input method
+	 * customization (gamepad support) TODO: Implement shader registration for spell effects TODO:
+	 * Register sound event pre-loading TODO: Add debug screen overlay registration TODO: Implement
+	 * video settings for spell visuals TODO: Register texture atlases for animated textures
+	 */
 	@SuppressWarnings("null")
 	@Override
 	public void onInitializeClient() {

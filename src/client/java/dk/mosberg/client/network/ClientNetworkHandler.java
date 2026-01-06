@@ -8,6 +8,12 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 /**
  * Handles client-side network packet reception.
+ *
+ * TODO: Add disconnect handling (clear cached data on disconnect) TODO: Implement packet validation
+ * (checksums, version checks) TODO: Add packet re-ordering for out-of-order delivery TODO:
+ * Implement bandwidth optimization (compression, delta encoding) TODO: Add packet history for
+ * debugging/logs TODO: Implement custom packet handlers registration system TODO: Add telemetry for
+ * packet latency tracking TODO: Implement graceful degradation for missing spell data
  */
 public class ClientNetworkHandler {
 

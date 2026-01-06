@@ -93,4 +93,15 @@ public class StaffItem extends Item {
         return stack;
     }
 
+    // TODO: Add staff enchantment support
+    // TODO: Add staff durability mechanics
+    // TODO: Add staff leveling/mastery system
+    // TODO: Add staff special ability/ultimate spells
+    // TODO: Add staff element infusion mechanics
+    // TODO: Add staff color/customization options
+    // TODO: Add staff stats display (crit chance, spell power, etc.)
+    // TODO: Add staff cooldown reduction modifiers
+    // TODO: Add staff mana regeneration bonuses
+    // TODO: Add staff passive effect triggers
+
 }

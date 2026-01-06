@@ -13,6 +13,12 @@ import net.minecraft.util.Identifier;
 /**
  * Client-side handler for spellbook spell casting. Intercepts spellbook use events and sends cast
  * spell packets to server.
+ *
+ * TODO: Add charge-up mechanics (hold to build power) TODO: Implement spell aimed mode (crosshair
+ * targeting) TODO: Add continuous casting support (hold for duration) TODO: Implement combo
+ * detection (rapid spell succession) TODO: Add casting cancellation (ESC key) TODO: Implement staff
+ * attachment animations TODO: Add client-side prediction for instant feedback TODO: Implement spell
+ * prep animations/effects
  */
 @Environment(EnvType.CLIENT)
 public class StaffCastingHandler {

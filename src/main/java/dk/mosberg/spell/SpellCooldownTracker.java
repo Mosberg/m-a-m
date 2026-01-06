@@ -8,6 +8,13 @@ import net.minecraft.util.Identifier;
 /**
  * Tracks active spell cooldowns per player. Used to prevent spam casting. Stores spell ID ->
  * remaining cooldown time in seconds.
+ *
+ * TODO: Implement shared cooldown groups (spells on same cooldown) TODO: Add cooldown reduction
+ * modifiers (from equipment/buffs) TODO: Implement cooldown stacking for repeated casts (increasing
+ * penalties) TODO: Add cooldown reset mechanics (triggered by specific events) TODO: Implement
+ * cooldown visualization (progress bar, particle effects) TODO: Add partial cooldown recovery
+ * (faster recovery for certain schools) TODO: Implement cooldown immunity periods (for overpowered
+ * spells) TODO: Add cooldown persistence across respawns (with reset option)
  */
 public class SpellCooldownTracker {
     private final Map<Identifier, Float> cooldowns = new HashMap<>();

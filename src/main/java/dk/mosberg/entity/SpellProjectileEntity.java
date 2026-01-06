@@ -32,6 +32,15 @@ import net.minecraft.world.World;
 /**
  * Custom projectile entity for spell casting. Implements FlyingItemEntity to support proper
  * rendering with ItemStack visuals.
+ *
+ * TODO: Implement homing projectile behavior (seeking target with radius) TODO: Add projectile
+ * bounce/ricochet mechanics (configurable bounce count/angle) TODO: Implement piercing projectiles
+ * that ignore entity collision up to max hits TODO: Add trajectory prediction/curves (parabolic,
+ * sine wave, spiral patterns) TODO: Implement chaining projectiles (jump to nearby targets on hit)
+ * TODO: Add detonation mechanics (delayed explosion, proximity trigger, on-water) TODO: Implement
+ * frost trail effects (slowness aura, block freezing) TODO: Add fire trail effects (ignite blocks,
+ * spreading fire) TODO: Implement particle trail customization per tier/school TODO: Add sound
+ * effects on spawn, trail, impact (school-specific)
  */
 public class SpellProjectileEntity extends ProjectileEntity implements FlyingItemEntity {
     private static final TrackedData<Byte> SCHOOL_TRACKER =

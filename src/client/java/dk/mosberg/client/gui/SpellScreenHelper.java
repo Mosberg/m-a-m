@@ -10,6 +10,12 @@ import net.minecraft.client.MinecraftClient;
 
 /**
  * Client-side helper for opening spell selection screen.
+ *
+ * TODO: Add screen transition animations TODO: Implement spell history tracking (recently cast
+ * spells) TODO: Add quick-access spell shortcuts TODO: Implement nested screen support (backup
+ * actions) TODO: Add loading state indication TODO: Implement error handling for network delays
+ * TODO: Add screen memory (restore last state when reopened) TODO: Implement accessibility options
+ * (large text, high contrast)
  */
 @Environment(EnvType.CLIENT)
 public class SpellScreenHelper {

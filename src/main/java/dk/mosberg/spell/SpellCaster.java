@@ -123,15 +123,31 @@ public class SpellCaster {
 
     private static void castRitual(ServerPlayerEntity player, Spell spell) {
         // TODO: Implement ritual casting with channeling
+        // TODO: Add channeling UI feedback and interruption mechanics
+        // TODO: Add ritual duration configuration
+        // TODO: Add ritual area protection/blessing mechanics
         // For now, treat as instant utility
         castUtility(player, spell);
     }
 
     private static void castSynergy(ServerPlayerEntity player, Spell spell) {
         // TODO: Implement synergy spells combining multiple schools
+        // TODO: Add multi-player synergy mechanics (combining casts)
+        // TODO: Add spell combination/fusion system
+        // TODO: Add synergy bonus scaling configuration
         // For now, treat as AoE
         castAoE(player, spell);
     }
+
+    // TODO: Add spell interruption/cancellation mechanics
+    // TODO: Add spell reflection/parry system
+    // TODO: Add spell immunity/resistance mechanics
+    // TODO: Add persistent spell effects (auras, buffs, debuffs)
+    // TODO: Add spell combo system (chaining spells together)
+    // TODO: Add spell projectile tracking and bouncing
+    // TODO: Add spell beam/ray casting mechanics
+    // TODO: Add spell teleportation mechanics
+    // TODO: Add spell summoning mechanics (minions, totems)
 
     private static boolean hasRequiredSpellbook(ServerPlayerEntity player, Spell spell) {
         var main = player.getMainHandStack();

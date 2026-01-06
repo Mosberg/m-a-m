@@ -10,6 +10,12 @@ import net.minecraft.util.Identifier;
 
 /**
  * Client-to-Server packet for casting a spell.
+ *
+ * TODO: Add spell targeting data (target coordinates, entity UUID) TODO: Implement spell variant
+ * selection (alternate effects/paths) TODO: Add spell modification flags (empowered, hastened,
+ * etc.) TODO: Support spell chaining (cast in sequence on same payload) TODO: Add spell prediction
+ * data for server validation TODO: Implement conditional spell casting (if mana > X then cast)
+ * TODO: Add combo tracking (previous spells in sequence)
  */
 public record CastSpellPayload(Identifier spellId) implements CustomPayload {
 

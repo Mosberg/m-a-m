@@ -10,6 +10,13 @@ import net.fabricmc.loader.api.FabricLoader;
 
 /**
  * Client-side configuration stored in JSON format.
+ *
+ * TODO: Add HUD layout presets (compact, minimal, detailed, classic) TODO: Implement color theme
+ * customization (light/dark/custom) TODO: Add particle intensity slider (low/normal/high/ultra)
+ * TODO: Implement sound volume per spell school TODO: Add tooltip verbosity settings TODO:
+ * Implement screen shake intensity slider TODO: Add accessibility options (colorblind modes, text
+ * sizes) TODO: Implement keybind customization UI TODO: Add performance/quality settings (render
+ * distance, shadows) TODO: Implement language selection override
  */
 public class ClientConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();

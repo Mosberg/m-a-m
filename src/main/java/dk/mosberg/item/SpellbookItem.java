@@ -96,4 +96,15 @@ public class SpellbookItem extends Item {
         // Client sends packet in StaffCastingHandler
         return ActionResult.SUCCESS;
     }
+
+    // TODO: Add spellbook enchantment support
+    // TODO: Add spellbook experience/leveling system
+    // TODO: Add spellbook quick-cast shortcuts
+    // TODO: Add spellbook spell organization/sorting
+    // TODO: Add spellbook custom spell descriptions
+    // TODO: Add spellbook rarity/quality tiers
+    // TODO: Add spellbook passive bonuses
+    // TODO: Add spellbook spell requirement checking
+    // TODO: Add spellbook craft-ability metrics
+    // TODO: Add spellbook sharing/trading mechanics
 }

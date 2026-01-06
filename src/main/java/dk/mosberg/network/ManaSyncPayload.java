@@ -11,6 +11,12 @@ import net.minecraft.util.Identifier;
 
 /**
  * Server-to-Client packet for synchronizing mana data.
+ *
+ * TODO: Add mana regeneration rate sync (client-side prediction) TODO: Include active effects/buffs
+ * mana modification state TODO: Add mana pool status flags (burning, frozen, corrupted) TODO:
+ * Include burst/overdrive state information TODO: Add timestamp for latency compensation TODO:
+ * Implement delta encoding for bandwidth optimization TODO: Add status effects info (what's
+ * modifying mana currently) TODO: Include prediction delta (server estimated mana next tick)
  */
 public record ManaSyncPayload(float personalMana, float personalMax, float auraMana, float auraMax,
         float reserveMana, float reserveMax, String activePriority) implements CustomPayload {

@@ -11,6 +11,12 @@ import net.minecraft.util.Identifier;
 
 /**
  * Server-to-Client packet for opening the spell selection GUI.
+ *
+ * TODO: Add available spells list (avoid resending data unnecessarily) TODO: Include player's
+ * current mana state in payload TODO: Add cooldown information for active spells TODO: Include GUI
+ * customization flags (layout, theme) TODO: Add contextual info (PvP mode, area effects, etc.)
+ * TODO: Include spell school affinity information TODO: Add recommendations for current situation
+ * TODO: Implement quick-close timeout
  */
 public record OpenSpellBookPayload(int tier) implements CustomPayload {
 

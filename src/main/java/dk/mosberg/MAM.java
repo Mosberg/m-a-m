@@ -175,4 +175,19 @@ public class MAM implements ModInitializer {
 	private static Item registerItem(String name, Item item) {
 		return Registry.register(Registries.ITEM, Identifier.of(MOD_ID, name), item);
 	}
+
+	// TODO: Add crafting recipes for spellbooks and staffs
+	// TODO: Add enchantment/upgrade recipes
+	// TODO: Add gemstone crafting mechanics
+	// TODO: Add spell fusion/combination crafting
+	// TODO: Add item transmutation mechanics
+	// TODO: Add block/world interaction spells
+	// TODO: Add mob/creature interaction spells
+	// TODO: Add dimension/portal spells
+	// TODO: Add PvP duel/arena mechanics
+	// TODO: Add spell tournament/competition system
+	// TODO: Add quest/mission system for spells
+	// TODO: Add achievement/advancement system for magic
+	// TODO: Add leaderboard/ranking system
+	// TODO: Add spell certification/mastery levels
 }
