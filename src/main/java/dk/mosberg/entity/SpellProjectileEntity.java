@@ -36,14 +36,21 @@ public class SpellProjectileEntity extends ProjectileEntity {
     public SpellProjectileEntity(World world, LivingEntity owner, Spell spell) {
         super(MAMEntities.SPELL_PROJECTILE, world);
         this.setOwner(owner);
-        this.setPosition(owner.getEyePos());
         this.school = spell.getSchool();
         this.damage = spell.getDamage();
         this.knockback = spell.getKnockback();
+        float speed = Math.max(0.05f, spell.getProjectileSpeed());
+        this.maxAge = Math.min(200, Math.max(40, Math.round((spell.getRange() / speed) * 20f)));
 
-        // Set velocity based on player's look direction and spell speed
-        Vec3d velocity = owner.getRotationVec(1.0F).multiply(spell.getProjectileSpeed());
-        this.setVelocity(velocity);
+        // Spawn a little in front of the caster to avoid self-collision
+        Vec3d look = owner.getRotationVec(1.0F);
+        Vec3d spawnPos = owner.getEyePos().add(look.multiply(0.4));
+        this.refreshPositionAndAngles(spawnPos.x, spawnPos.y, spawnPos.z, owner.getYaw(),
+                owner.getPitch());
+
+        // FireCharge-inspired launch: use rotation with zero divergence and configurable speed
+        this.setVelocity(owner, owner.getPitch(), owner.getYaw(), 0.0F, speed, 0.0F);
+        this.setNoGravity(true);
     }
 
     @Override
@@ -55,28 +62,26 @@ public class SpellProjectileEntity extends ProjectileEntity {
     public void tick() {
         super.tick();
 
-        // Check age and remove if too old
         if (++age > maxAge) {
             this.discard();
             return;
         }
 
-        // Check for collisions
         HitResult hitResult = ProjectileUtil.getCollision(this, this::canHit);
-
         if (hitResult.getType() != HitResult.Type.MISS) {
             this.onCollision(hitResult);
+            return;
         }
 
-        // Update position
         Vec3d velocity = this.getVelocity();
         this.setPosition(this.getX() + velocity.x, this.getY() + velocity.y,
                 this.getZ() + velocity.z);
+        ProjectileUtil.setRotationFromVelocity(this, 0.2f);
 
-        // Apply gravity (slight downward force)
-        this.setVelocity(velocity.x, velocity.y - 0.01, velocity.z);
+        // Maintain speed with light drag; no gravity for straight shots
+        float drag = this.isTouchingWater() ? 0.8f : 0.99f;
+        this.setVelocity(velocity.multiply(drag));
 
-        // Spawn particles on client
         if (this.getEntityWorld().isClient()) {
             spawnParticles();
         }
