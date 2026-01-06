@@ -1,0 +1,24 @@
+{
+  "id": "mam:earth_quake",
+  "name": "Earth Quake",
+  "school": "earth",
+  "description": "Shakes the earth, stunning and damaging nearby enemies",
+  "castType": "projectile",
+  "manaCost": 30.0,
+  "castTime": 1.0,
+  "cooldown": 8.0,
+  "tier": 3,
+  "requiredLevel": 20,
+  "damage": 14.0,
+  "range": 48.0,
+  "projectileSpeed": 1.3,
+  "aoeRadius": 9.0,
+  "knockback": 1.2,
+  "sound": "entity.warden.heartbeat",
+  "tags": ["strike", "projectile", "tier3", "earth", "aoe"],
+  "vfx": {
+    "particleType": "block",
+    "color": "8B7355",
+    "particleCount": 38
+  }
+}

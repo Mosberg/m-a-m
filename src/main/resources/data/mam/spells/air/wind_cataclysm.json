@@ -1,0 +1,24 @@
+{
+  "id": "mam:wind_cataclysm",
+  "name": "Wind Cataclysm",
+  "school": "air",
+  "description": "Unleashes a catastrophic windstorm that tears through enemies",
+  "castType": "projectile",
+  "manaCost": 52.0,
+  "castTime": 1.5,
+  "cooldown": 10.5,
+  "tier": 4,
+  "requiredLevel": 30,
+  "damage": 20.0,
+  "range": 65.0,
+  "projectileSpeed": 1.8,
+  "aoeRadius": 10.0,
+  "knockback": 3.0,
+  "sound": "entity.warden.sonic_boom",
+  "tags": ["strike", "projectile", "tier4", "air", "knockback", "ultimate"],
+  "vfx": {
+    "particleType": "happy_villager",
+    "color": "00BFFF",
+    "particleCount": 46
+  }
+}

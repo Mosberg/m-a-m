@@ -1,0 +1,24 @@
+{
+  "id": "mam:inferno",
+  "name": "Inferno",
+  "school": "fire",
+  "description": "A devastating fire spell that engulfs enemies in flames",
+  "castType": "projectile",
+  "manaCost": 32.0,
+  "castTime": 1.0,
+  "cooldown": 8.0,
+  "tier": 3,
+  "requiredLevel": 20,
+  "damage": 15.0,
+  "range": 50.0,
+  "projectileSpeed": 1.5,
+  "aoeRadius": 8.0,
+  "knockback": 1.5,
+  "sound": "entity.blaze.shoot",
+  "tags": ["strike", "projectile", "tier3", "fire", "aoe"],
+  "vfx": {
+    "particleType": "flame",
+    "color": "FF4500",
+    "particleCount": 40
+  }
+}

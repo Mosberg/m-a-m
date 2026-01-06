@@ -1,0 +1,24 @@
+{
+  "id": "mam:air_storm",
+  "name": "Air Storm",
+  "school": "air",
+  "description": "A swirling vortex of wind that buffets enemies",
+  "castType": "projectile",
+  "manaCost": 26.0,
+  "castTime": 1.0,
+  "cooldown": 6.5,
+  "tier": 3,
+  "requiredLevel": 20,
+  "damage": 10.0,
+  "range": 55.0,
+  "projectileSpeed": 1.7,
+  "aoeRadius": 6.0,
+  "knockback": 2.5,
+  "sound": "block.bubble_column.whirlpool_inside",
+  "tags": ["strike", "projectile", "tier3", "air", "knockback"],
+  "vfx": {
+    "particleType": "happy_villager",
+    "color": "87CEEB",
+    "particleCount": 34
+  }
+}

@@ -67,12 +67,23 @@ public class Spell {
     private final java.util.Map<String, Float> customData;
     private final String sound;
     private final VfxData vfx;
+    private final List<String> tags;
 
     public Spell(Identifier id, String name, String school, String description, String castType,
             float manaCost, float castTime, float cooldown, int tier, int requiredLevel,
             float damage, float range, float projectileSpeed, float aoeRadius, float knockback,
             List<StatusEffectEntry> statusEffects, java.util.Map<String, Float> customData,
             String sound, Optional<VfxData> vfx) {
+        this(id, name, school, description, castType, manaCost, castTime, cooldown, tier,
+                requiredLevel, damage, range, projectileSpeed, aoeRadius, knockback, statusEffects,
+                customData, sound, vfx, List.of());
+    }
+
+    public Spell(Identifier id, String name, String school, String description, String castType,
+            float manaCost, float castTime, float cooldown, int tier, int requiredLevel,
+            float damage, float range, float projectileSpeed, float aoeRadius, float knockback,
+            List<StatusEffectEntry> statusEffects, java.util.Map<String, Float> customData,
+            String sound, Optional<VfxData> vfx, List<String> tags) {
         this.id = id;
         this.name = name;
         this.school = SpellSchool.valueOf(school.toUpperCase());
@@ -92,6 +103,7 @@ public class Spell {
         this.customData = customData;
         this.sound = sound;
         this.vfx = vfx.orElse(null);
+        this.tags = new java.util.ArrayList<>(tags);
     }
 
     /**
@@ -190,6 +202,10 @@ public class Spell {
 
     public String getTranslationKey() {
         return "spell." + id.getNamespace() + "." + id.getPath();
+    }
+
+    public List<String> getTags() {
+        return new java.util.ArrayList<>(tags);
     }
 
     // Status effect entry for serialization

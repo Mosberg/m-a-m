@@ -1,0 +1,24 @@
+{
+  "id": "mam:water_torrent",
+  "name": "Water Torrent",
+  "school": "water",
+  "description": "A powerful torrent of water that washes enemies away",
+  "castType": "projectile",
+  "manaCost": 28.0,
+  "castTime": 1.0,
+  "cooldown": 7.0,
+  "tier": 3,
+  "requiredLevel": 20,
+  "damage": 12.0,
+  "range": 50.0,
+  "projectileSpeed": 1.4,
+  "aoeRadius": 7.0,
+  "knockback": 2.0,
+  "sound": "entity.glow_squid.squirt",
+  "tags": ["strike", "projectile", "tier3", "water", "knockback"],
+  "vfx": {
+    "particleType": "splash",
+    "color": "1E90FF",
+    "particleCount": 36
+  }
+}

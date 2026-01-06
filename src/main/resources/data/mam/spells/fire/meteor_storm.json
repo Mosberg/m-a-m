@@ -1,0 +1,24 @@
+{
+  "id": "mam:meteor_storm",
+  "name": "Meteor Storm",
+  "school": "fire",
+  "description": "Calls down a devastating rain of meteors, incinerating all in its path",
+  "castType": "projectile",
+  "manaCost": 60.0,
+  "castTime": 1.5,
+  "cooldown": 12.0,
+  "tier": 4,
+  "requiredLevel": 30,
+  "damage": 25.0,
+  "range": 60.0,
+  "projectileSpeed": 1.6,
+  "aoeRadius": 12.0,
+  "knockback": 2.0,
+  "sound": "entity.warden.sonic_boom",
+  "tags": ["strike", "projectile", "tier4", "fire", "aoe", "ultimate"],
+  "vfx": {
+    "particleType": "flame",
+    "color": "FF8C00",
+    "particleCount": 50
+  }
+}

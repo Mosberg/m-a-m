@@ -4,6 +4,7 @@ import java.util.Objects;
 import dk.mosberg.MAM;
 import dk.mosberg.entity.SpellProjectileEntity;
 import dk.mosberg.mana.ManaAttachments;
+import dk.mosberg.mana.PlayerCastingData;
 import dk.mosberg.mana.PlayerManaData;
 import dk.mosberg.network.ServerNetworkHandler;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -14,21 +15,31 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 
 /**
- * Handles spell casting logic on the server.
+ * Handles spell casting logic on the server, including mana consumption and cooldown tracking.
  */
 public class SpellCaster {
 
     public static void castSpell(ServerPlayerEntity player, Spell spell) {
         @SuppressWarnings("null")
-        PlayerManaData manaData = Objects.requireNonNull(
-                player.getAttachedOrCreate(ManaAttachments.PLAYER_MANA, PlayerManaData::new),
-                "Player mana attachment should always exist");
+        PlayerCastingData castingData = Objects.requireNonNull(
+                player.getAttachedOrCreate(ManaAttachments.PLAYER_CASTING, PlayerCastingData::new),
+                "Player casting data attachment should always exist");
+
+        // Check cooldown FIRST before consuming mana
+        if (castingData.getCooldownTracker().isOnCooldown(spell.getId())) {
+            float remaining = castingData.getCooldownTracker().getRemainingCooldown(spell.getId());
+            player.sendMessage(
+                    Text.literal(String.format("Spell on cooldown: %.1fs remaining", remaining)),
+                    true);
+            return;
+        }
 
         if (!hasRequiredSpellbook(player, spell)) {
             return;
         }
 
         // Check mana cost
+        PlayerManaData manaData = castingData.getManaData();
         if (!manaData.consumeMana(spell.getManaCost())) {
             player.sendMessage(Text.translatable("mana.mam.insufficient"), true);
             return;
@@ -36,6 +47,9 @@ public class SpellCaster {
 
         // Sync mana to client after consumption
         ServerNetworkHandler.syncManaToClient(player);
+
+        // Start cooldown for this spell
+        castingData.getCooldownTracker().startCooldown(spell.getId(), spell.getCooldown());
 
         // Cast spell based on type
         switch (spell.getCastType()) {

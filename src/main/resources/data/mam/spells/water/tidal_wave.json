@@ -1,0 +1,24 @@
+{
+  "id": "mam:tidal_wave",
+  "name": "Tidal Wave",
+  "school": "water",
+  "description": "Summons an enormous wave that drowns all enemies it encounters",
+  "castType": "projectile",
+  "manaCost": 55.0,
+  "castTime": 1.5,
+  "cooldown": 11.0,
+  "tier": 4,
+  "requiredLevel": 30,
+  "damage": 22.0,
+  "range": 60.0,
+  "projectileSpeed": 1.5,
+  "aoeRadius": 11.0,
+  "knockback": 2.5,
+  "sound": "entity.warden.sonic_boom",
+  "tags": ["strike", "projectile", "tier4", "water", "aoe", "ultimate"],
+  "vfx": {
+    "particleType": "splash",
+    "color": "0080FF",
+    "particleCount": 48
+  }
+}

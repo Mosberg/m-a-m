@@ -82,9 +82,12 @@ public class ServerNetworkHandler {
      */
     public static void syncManaToClient(net.minecraft.server.network.ServerPlayerEntity player) {
         @SuppressWarnings("null")
-        PlayerManaData manaData = Objects.requireNonNull(
-                player.getAttachedOrCreate(ManaAttachments.PLAYER_MANA, PlayerManaData::new),
-                "Player mana attachment should always exist");
+        dk.mosberg.mana.PlayerCastingData castingData = Objects.requireNonNull(
+                player.getAttachedOrCreate(ManaAttachments.PLAYER_CASTING,
+                        dk.mosberg.mana.PlayerCastingData::new),
+                "Player casting data attachment should always exist");
+
+        PlayerManaData manaData = castingData.getManaData();
 
         ManaSyncPayload payload =
                 new ManaSyncPayload(manaData.getPool(ManaPoolType.PERSONAL).getCurrentMana(),

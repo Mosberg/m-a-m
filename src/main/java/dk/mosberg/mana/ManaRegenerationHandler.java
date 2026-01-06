@@ -9,7 +9,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 /**
- * Handles server-side mana regeneration for all players.
+ * Handles server-side mana regeneration and cooldown ticking for all players.
  */
 public class ManaRegenerationHandler {
 
@@ -29,12 +29,13 @@ public class ManaRegenerationHandler {
             int currentTick = (int) (server.getOverworld().getTime() % Integer.MAX_VALUE);
 
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-                PlayerManaData manaData =
-                        Objects.requireNonNull(
-                                player.getAttachedOrCreate(ManaAttachments.PLAYER_MANA,
-                                        PlayerManaData::new),
-                                "Player mana attachment should always exist");
-                manaData.tickRegeneration();
+                PlayerCastingData castingData = Objects.requireNonNull(
+                        player.getAttachedOrCreate(ManaAttachments.PLAYER_CASTING,
+                                PlayerCastingData::new),
+                        "Player casting data attachment should always exist");
+
+                // Tick mana regen and cooldown timers
+                castingData.tick();
 
                 if (syncEnabled && currentTick % syncInterval == 0) {
                     ServerNetworkHandler.syncManaToClient(player);
@@ -42,6 +43,6 @@ public class ManaRegenerationHandler {
             }
         });
 
-        MAM.LOGGER.info("Registered mana regeneration handler");
+        MAM.LOGGER.info("Registered mana regeneration and cooldown handler");
     }
 }

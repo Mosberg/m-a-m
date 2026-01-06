@@ -1,0 +1,24 @@
+{
+  "id": "mam:continental_rift",
+  "name": "Continental Rift",
+  "school": "earth",
+  "description": "Tears the earth asunder, creating a chasm that swallows enemies",
+  "castType": "projectile",
+  "manaCost": 58.0,
+  "castTime": 1.5,
+  "cooldown": 12.0,
+  "tier": 4,
+  "requiredLevel": 30,
+  "damage": 24.0,
+  "range": 58.0,
+  "projectileSpeed": 1.4,
+  "aoeRadius": 13.0,
+  "knockback": 1.8,
+  "sound": "entity.warden.sonic_boom",
+  "tags": ["strike", "projectile", "tier4", "earth", "aoe", "ultimate"],
+  "vfx": {
+    "particleType": "block",
+    "color": "654321",
+    "particleCount": 52
+  }
+}
