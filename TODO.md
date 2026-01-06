@@ -83,53 +83,53 @@ This document contains all TODO items from the codebase organized by implementat
 
 ### Player Mana Data
 
-- [ ] **PlayerManaData.java** - Implement mana pool overflow mechanic (cap excess, redirect to other pools)
-- [ ] **PlayerManaData.java** - Add mana drain effects (applied by spells/items, reduces regen temporarily)
-- [ ] **PlayerManaData.java** - Implement mana shield system (absorbs damage instead of health)
-- [ ] **PlayerManaData.java** - Add restoration mechanics (potions, items, passive abilities)
-- [ ] **PlayerManaData.java** - Implement mana sharing/transfer between players (coop mechanics)
-- [ ] **PlayerManaData.java** - Add pool burnout penalty (too much casting from one pool reduces stats)
-- [ ] **PlayerManaData.java** - Implement mana burst mode (temporary high consumption, high output)
-- [ ] **PlayerManaData.java** - Add synchronization events to notify clients of mana changes
-- [ ] **PlayerManaData.java** - Implement mana debt system (temporarily borrow from future regen)
-- [ ] **PlayerManaData.java** - Add mana efficiency modifiers per player (from equipment/buffs)
+- [x] **PlayerManaData.java** - Implement mana pool overflow mechanic (cap excess, redirect to other pools)
+- [x] **PlayerManaData.java** - Add mana drain effects (applied by spells/items, reduces regen temporarily)
+- [x] **PlayerManaData.java** - Implement mana shield system (absorbs damage instead of health)
+- [x] **PlayerManaData.java** - Add restoration mechanics (potions, items, passive abilities)
+- [x] **PlayerManaData.java** - Implement mana sharing/transfer between players (coop mechanics)
+- [x] **PlayerManaData.java** - Add pool burnout penalty (too much casting from one pool reduces stats)
+- [x] **PlayerManaData.java** - Implement mana burst mode (temporary high consumption, high output)
+- [x] **PlayerManaData.java** - Add synchronization events to notify clients of mana changes
+- [x] **PlayerManaData.java** - Implement mana debt system (temporarily borrow from future regen)
+- [x] **PlayerManaData.java** - Add mana efficiency modifiers per player (from equipment/buffs)
 
 ### Casting Data & State
 
-- [ ] **PlayerCastingData.java** - Add casting state tracking (idle, channeling, casting, cooldown phases)
-- [ ] **PlayerCastingData.java** - Implement interrupt mechanics (damage/movement breaks channeling)
-- [ ] **PlayerCastingData.java** - Add concentration system (tracking focus level for spell accuracy/power)
-- [ ] **PlayerCastingData.java** - Implement casting speed modifiers (haste/slowness effects)
-- [ ] **PlayerCastingData.java** - Add backfire/critical failure mechanics for low concentration
-- [ ] **PlayerCastingData.java** - Implement combo system tracking (consecutive similar spells)
-- [ ] **PlayerCastingData.java** - Add rhythm-based casting (timed button presses for bonuses)
-- [ ] **PlayerCastingData.java** - Implement spell memory system (memorized spells for quick access)
-- [ ] **PlayerCastingData.java** - Add fatigue system (too much casting reduces effectiveness)
-- [ ] **PlayerCastingData.java** - Implement synergy tracking (combining elements with other players)
+- [x] **PlayerCastingData.java** - Add casting state tracking (idle, channeling, casting, cooldown phases)
+- [x] **PlayerCastingData.java** - Implement interrupt mechanics (damage/movement breaks channeling)
+- [x] **PlayerCastingData.java** - Add concentration system (tracking focus level for spell accuracy/power)
+- [x] **PlayerCastingData.java** - Implement casting speed modifiers (haste/slowness effects)
+- [x] **PlayerCastingData.java** - Add backfire/critical failure mechanics for low concentration
+- [x] **PlayerCastingData.java** - Implement combo system tracking (consecutive similar spells)
+- [x] **PlayerCastingData.java** - Add rhythm-based casting (timed button presses for bonuses)
+- [x] **PlayerCastingData.java** - Implement spell memory system (memorized spells for quick access)
+- [x] **PlayerCastingData.java** - Add fatigue system (too much casting reduces effectiveness)
+- [x] **PlayerCastingData.java** - Implement synergy tracking (combining elements with other players)
 
 ### Mana Regeneration
 
-- [ ] **ManaRegenerationHandler.java** - Add conditional regen (only in safe zones, combat, etc.)
-- [ ] **ManaRegenerationHandler.java** - Implement mana drain/steal effects
-- [ ] **ManaRegenerationHandler.java** - Add mana shield mechanics
-- [ ] **ManaRegenerationHandler.java** - Implement depletion penalties
-- [ ] **ManaRegenerationHandler.java** - Add mana burst/overdrive mechanics
-- [ ] **ManaRegenerationHandler.java** - Implement restoration items/abilities
-- [ ] **ManaRegenerationHandler.java** - Add mana pool sharing between players
+- [x] **ManaRegenerationHandler.java** - Add conditional regen (only in safe zones, combat, etc.)
+- [x] **ManaRegenerationHandler.java** - Implement mana drain/steal effects
+- [x] **ManaRegenerationHandler.java** - Add mana shield mechanics
+- [x] **ManaRegenerationHandler.java** - Implement depletion penalties
+- [x] **ManaRegenerationHandler.java** - Add mana burst/overdrive mechanics
+- [x] **ManaRegenerationHandler.java** - Implement restoration items/abilities
+- [x] **ManaRegenerationHandler.java** - Add mana pool sharing between players
 - [ ] **ManaRegenerationHandler.java** - Implement pool visibility settings
 - [ ] **ManaRegenerationHandler.java** - Add regen boost abilities/items
-- [ ] **ManaRegenerationHandler.java** - Implement pooled mana transfer logic
+- [x] **ManaRegenerationHandler.java** - Implement pooled mana transfer logic
 
 ### Cooldown System
 
-- [ ] **SpellCooldownTracker.java** - Implement shared cooldown groups (spells on same cooldown)
-- [ ] **SpellCooldownTracker.java** - Add cooldown reduction modifiers (from equipment/buffs)
-- [ ] **SpellCooldownTracker.java** - Implement cooldown stacking for repeated casts (increasing penalties)
-- [ ] **SpellCooldownTracker.java** - Add cooldown reset mechanics (triggered by specific events)
+- [x] **SpellCooldownTracker.java** - Implement shared cooldown groups (spells on same cooldown)
+- [x] **SpellCooldownTracker.java** - Add cooldown reduction modifiers (from equipment/buffs)
+- [x] **SpellCooldownTracker.java** - Implement cooldown stacking for repeated casts (increasing penalties)
+- [x] **SpellCooldownTracker.java** - Add cooldown reset mechanics (triggered by specific events)
 - [ ] **SpellCooldownTracker.java** - Implement cooldown visualization (progress bar, particle effects)
-- [ ] **SpellCooldownTracker.java** - Add partial cooldown recovery (faster recovery for certain schools)
-- [ ] **SpellCooldownTracker.java** - Implement cooldown immunity periods (for overpowered spells)
-- [ ] **SpellCooldownTracker.java** - Add cooldown persistence across respawns (with reset option)
+- [x] **SpellCooldownTracker.java** - Add partial cooldown recovery (faster recovery for certain schools)
+- [x] **SpellCooldownTracker.java** - Implement cooldown immunity periods (for overpowered spells)
+- [x] **SpellCooldownTracker.java** - Add cooldown persistence across respawns (with reset option)
 
 ---
 
@@ -137,28 +137,28 @@ This document contains all TODO items from the codebase organized by implementat
 
 ### Spell Casting Logic
 
-- [ ] **SpellCaster.java** - Implement ritual channeling system
-- [ ] **SpellCaster.java** - Add synergy multi-player mechanics
-- [ ] **SpellCaster.java** - Implement spell combo detection
-- [ ] **SpellCaster.java** - Add beam/ray casting mechanics
-- [ ] **SpellCaster.java** - Implement teleportation spells
-- [ ] **SpellCaster.java** - Add summon mechanics
-- [ ] **SpellCaster.java** - Implement self-buff/debuff system
-- [ ] **SpellCaster.java** - Add trap placement mechanics
-- [ ] **SpellCaster.java** - Implement transformation system
+- [x] **SpellCaster.java** - Implement ritual channeling system
+- [x] **SpellCaster.java** - Add synergy multi-player mechanics
+- [x] **SpellCaster.java** - Implement spell combo detection
+- [x] **SpellCaster.java** - Add beam/ray casting mechanics
+- [x] **SpellCaster.java** - Implement teleportation spells
+- [x] **SpellCaster.java** - Add summon mechanics
+- [x] **SpellCaster.java** - Implement self-buff/debuff system
+- [x] **SpellCaster.java** - Add trap placement mechanics
+- [x] **SpellCaster.java** - Implement transformation system
 
 ### Projectiles & Entities
 
-- [ ] **SpellProjectileEntity.java** - Implement homing projectile behavior (seeking target with radius)
-- [ ] **SpellProjectileEntity.java** - Add projectile bounce/ricochet mechanics (configurable bounce count/angle)
-- [ ] **SpellProjectileEntity.java** - Implement piercing projectiles that ignore entity collision up to max hits
-- [ ] **SpellProjectileEntity.java** - Add trajectory prediction/curves (parabolic, sine wave, spiral patterns)
-- [ ] **SpellProjectileEntity.java** - Implement chaining projectiles (jump to nearby targets on hit)
-- [ ] **SpellProjectileEntity.java** - Add detonation mechanics (delayed explosion, proximity trigger, on-water)
-- [ ] **SpellProjectileEntity.java** - Implement frost trail effects (slowness aura, block freezing)
-- [ ] **SpellProjectileEntity.java** - Add fire trail effects (ignite blocks, spreading fire)
-- [ ] **SpellProjectileEntity.java** - Implement particle trail customization per tier/school
-- [ ] **SpellProjectileEntity.java** - Add sound effects on spawn, trail, impact (school-specific)
+- [x] **SpellProjectileEntity.java** - Implement homing projectile behavior (seeking target with radius)
+- [x] **SpellProjectileEntity.java** - Add projectile bounce/ricochet mechanics (configurable bounce count/angle)
+- [x] **SpellProjectileEntity.java** - Implement piercing projectiles that ignore entity collision up to max hits
+- [x] **SpellProjectileEntity.java** - Add trajectory prediction/curves (parabolic, sine wave, spiral patterns)
+- [x] **SpellProjectileEntity.java** - Implement chaining projectiles (jump to nearby targets on hit)
+- [x] **SpellProjectileEntity.java** - Add detonation mechanics (delayed explosion, proximity trigger, on-water)
+- [x] **SpellProjectileEntity.java** - Implement frost trail effects (slowness aura, block freezing)
+- [x] **SpellProjectileEntity.java** - Add fire trail effects (ignite blocks, spreading fire)
+- [x] **SpellProjectileEntity.java** - Implement particle trail customization per tier/school
+- [x] **SpellProjectileEntity.java** - Add sound effects on spawn, trail, impact (school-specific)
 
 ### Entity System
 

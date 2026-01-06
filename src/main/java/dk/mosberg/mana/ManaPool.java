@@ -187,6 +187,25 @@ public class ManaPool {
     }
 
     /**
+     * Restores mana to this pool, returning any overflow.
+     *
+     * @param amount Amount to restore
+     * @return Overflow amount that couldn't be added
+     */
+    public float restore(float amount) {
+        int maxCapacity = getMaxCapacity();
+        float newMana = currentMana + amount;
+
+        if (newMana > maxCapacity) {
+            currentMana = maxCapacity;
+            return newMana - maxCapacity; // Return overflow
+        } else {
+            currentMana = newMana;
+            return 0f; // No overflow
+        }
+    }
+
+    /**
      * Add temporary capacity modifier from buffs/items.
      */
     public void addTemporaryCapacity(float amount) {
