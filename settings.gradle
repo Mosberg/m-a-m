@@ -1,0 +1,21 @@
+// ═════════════════════════════════════════════════════════════════════════════════
+// Plugin Management Configuration
+// ═════════════════════════════════════════════════════════════════════════════════
+// Gradle queries these repositories IN ORDER for plugins (fabric-loom, maven-publish)
+
+pluginManagement {
+	repositories {
+		// Fabric Maven: Contains fabric-loom and all Minecraft/Fabric dependencies
+		maven {
+			name = 'Fabric'
+			url = 'https://maven.fabricmc.net/'
+		}
+		// Maven Central: Standard Java libraries and build plugins
+		mavenCentral()
+		// Gradle Plugin Portal: Gradle-native plugins (maven-publish, java, etc.)
+		gradlePluginPortal()
+	}
+}
+
+// Project Configuration
+rootProject.name = "mam"

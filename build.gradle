@@ -1,0 +1,333 @@
+plugins {
+    id 'fabric-loom' version "${loom_version}"
+    id 'maven-publish'
+    id 'java'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+    archivesName = project.archives_base_name
+}
+
+// ═════════════════════════════════════════════════════════════════════════════════
+// Maven Repositories for Dependencies
+// ═════════════════════════════════════════════════════════════════════════════════
+
+repositories {
+    mavenCentral()
+
+    mavenLocal()
+
+    maven {
+        name = "Fabric"
+        url = "https://maven.fabricmc.net/"
+    }
+
+    maven {
+        name = "Terraformers"
+        url = "https://maven.terraformersmc.com/releases/"
+    }
+
+    maven {
+        name = "Shedaniel"
+        url = "https://maven.shedaniel.me/"
+    }
+}
+
+// ═════════════════════════════════════════════════════════════════════════════════
+// Fabric Loom Configuration - IDE Integration and Run Configurations
+// ═════════════════════════════════════════════════════════════════════════════════
+
+loom {
+    splitEnvironmentSourceSets()
+
+	mods {
+		"mam" {
+			sourceSet sourceSets.main
+			sourceSet sourceSets.client
+		}
+	}
+
+    runs {
+        // Client run configuration (F5 in IDE)
+        client {
+            client()
+            configName = "Minecraft Client"
+            ideConfigGenerated = true
+            runDir = "run"
+        }
+
+        // Server run configuration (F5 in IDE)
+        server {
+            server()
+            configName = "Minecraft Server"
+            ideConfigGenerated = true
+            runDir = "run-server"
+        }
+    }
+}
+
+// ═════════════════════════════════════════════════════════════════════════════════
+// Fabric API Data Generation
+// ═════════════════════════════════════════════════════════════════════════════════
+
+fabricApi {
+	configureDataGeneration {
+		client = true
+	}
+}
+
+// ═════════════════════════════════════════════════════════════════════════════════
+// Dependencies - All Required Libraries and Frameworks
+// ═════════════════════════════════════════════════════════════════════════════════
+
+dependencies {
+    // Minecraft & Fabric Core
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+    // Libraries - Bundled with JAR
+    include implementation("com.google.code.gson:gson:${project.gson_version}")
+
+    // Compile-Only - Annotations for Better IDE Support
+    compileOnly "org.jetbrains:annotations:${project.annotations_version}"
+
+    // Testing Framework - JUnit 6 with BOM for Dependency Management
+    testImplementation platform("org.junit:junit-bom:${project.junit_version}")
+    testImplementation "org.junit.jupiter:junit-jupiter"
+    testImplementation "org.junit.jupiter:junit-jupiter-params"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}
+
+// ═════════════════════════════════════════════════════════════════════════════════
+// Source Sets Configuration
+// ═════════════════════════════════════════════════════════════════════════════════
+
+sourceSets {
+    main {
+        resources {
+            srcDirs += [
+                "src/main/generated/resources"
+            ]
+            exclude ".cache"
+        }
+    }
+}
+
+// ═════════════════════════════════════════════════════════════════════════════════
+// Resource Processing
+// ═════════════════════════════════════════════════════════════════════════════════
+
+processResources {
+    // Capture properties as local variables to avoid Groovy closure issues
+    def modId = project.mod_id
+    def modVersion = project.mod_version
+    def modName = project.mod_name
+    def modDescription = project.mod_description
+    def modAuthor = project.mod_author
+    def modHomepage = project.mod_homepage
+    def modSources = project.mod_sources
+    def modIssues = project.mod_issues
+    def modLicense = project.mod_license
+    def fabricLoaderVer = project.loader_version
+    def minecraftVer = project.minecraft_version
+    def javaVer = project.java_version
+
+    // Define inputs for build cache invalidation
+    inputs.property "mod_id", modId
+    inputs.property "mod_version", modVersion
+    inputs.property "mod_name", modName
+    inputs.property "mod_description", modDescription
+    inputs.property "mod_author", modAuthor
+    inputs.property "mod_homepage", modHomepage
+    inputs.property "mod_sources", modSources
+    inputs.property "mod_issues", modIssues
+    inputs.property "mod_license", modLicense
+    inputs.property "loader_version", fabricLoaderVer
+    inputs.property "minecraft_version", minecraftVer
+    inputs.property "java_version", javaVer
+
+    // Process fabric.mod.json template with property values
+    filesMatching("fabric.mod.json") {
+        expand(
+            "mod_id": modId,
+            "mod_version": modVersion,
+            "mod_name": modName,
+            "mod_description": modDescription,
+            "mod_author": modAuthor,
+            "mod_homepage": modHomepage,
+            "mod_sources": modSources,
+            "mod_issues": modIssues,
+            "mod_license": modLicense,
+            "loader_version": fabricLoaderVer,
+            "minecraft_version": minecraftVer,
+            "java_version": javaVer
+        )
+    }
+}
+
+// ═════════════════════════════════════════════════════════════════════════════════
+// Java Compilation Configuration
+// ═════════════════════════════════════════════════════════════════════════════════
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = "UTF-8"
+    it.options.release = project.java_version.toInteger()
+    it.options.compilerArgs += ["-Xlint:deprecation", "-Xlint:unchecked"]
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(project.java_version.toInteger())
+    }
+    withSourcesJar()
+    withJavadocJar()
+
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+// ═════════════════════════════════════════════════════════════════════════════════
+// JAR Manifest Configuration - Build Metadata
+// ═════════════════════════════════════════════════════════════════════════════════
+
+jar {
+    // Capture properties for manifest
+    def archivesBaseName = project.archives_base_name
+    def modName = project.mod_name
+    def modAuthor = project.mod_author
+    def modVersion = project.version
+
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+
+    from("LICENSE") {
+        rename { "${it}_${archivesBaseName}" }
+    }
+
+    manifest {
+        attributes(
+            "Specification-Title": modName,
+            "Specification-Vendor": modAuthor,
+            "Specification-Version": "1",
+            "Implementation-Title": modName,
+            "Implementation-Version": modVersion,
+            "Implementation-Vendor": modAuthor,
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        )
+    }
+}
+
+// ═════════════════════════════════════════════════════════════════════════════════
+// Javadoc Configuration - Documentation Generation
+// ═════════════════════════════════════════════════════════════════════════════════
+
+javadoc {
+    options.encoding = 'UTF-8'
+    options.charSet = 'UTF-8'
+    options.addStringOption('Xdoclint:none', '-quiet')
+}
+
+// ═════════════════════════════════════════════════════════════════════════════════
+// Test Configuration - JUnit 5 with Comprehensive Logging
+// ═════════════════════════════════════════════════════════════════════════════════
+
+test {
+    useJUnitPlatform()
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat = "full"
+        showStandardStreams = false
+    }
+}
+
+// ═════════════════════════════════════════════════════════════════════════════════
+// Maven Publication Configuration - JAR Distribution
+// ═════════════════════════════════════════════════════════════════════════════════
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = project.archives_base_name
+            from components.java
+
+            pom {
+                name = project.mod_name
+                description = project.mod_description
+                url = project.mod_homepage
+
+                licenses {
+                    license {
+                        name = project.mod_license
+                    }
+                }
+
+                developers {
+                    developer {
+                        name = project.mod_author
+                    }
+                }
+
+                scm {
+                    url = project.mod_sources
+                    connection = "scm:git:${project.mod_sources}.git"
+                }
+            }
+        }
+    }
+
+    repositories {
+        // Uncomment to publish to local Maven repository
+        // mavenLocal()
+
+        // Template for custom Maven repository
+        // maven {
+        //     name = "MyMaven"
+        //     url = "https://maven.example.com/releases"
+        //     credentials {
+        //         username = project.findProperty("maven.username") ?: System.getenv("MAVEN_USERNAME")
+        //         password = project.findProperty("maven.password") ?: System.getenv("MAVEN_PASSWORD")
+        //     }
+        // }
+    }
+}
+
+// ═════════════════════════════════════════════════════════════════════════════════
+// Custom Tasks - Utility Commands
+// ═════════════════════════════════════════════════════════════════════════════════
+
+// Display build information - Configuration cache compliant
+tasks.register("projectInfo") {
+    // Capture properties at configuration time for configuration cache compatibility
+    def modName = project.mod_name
+    def modVersion = project.mod_version
+    def minecraftVersion = project.minecraft_version
+    def loaderVersion = project.loader_version
+    def fabricVersion = project.fabric_version
+    def javaVersion = project.java_version
+    def gradleVersion = gradle.gradleVersion
+    doLast {
+        println """
+            ======================================
+            Mana And Magic Build Information
+            ======================================
+            Mod Name:       ${modName}
+            Version:        ${modVersion}
+            Minecraft:      ${minecraftVersion}
+            Fabric Loader:  ${loaderVersion}
+            Fabric API:     ${fabricVersion}
+            Java Version:   ${javaVersion}
+            Gradle Version: ${gradleVersion}
+            ======================================
+        """.stripIndent()
+    }
+}
+
+// Clean build artifacts
+clean {
+}

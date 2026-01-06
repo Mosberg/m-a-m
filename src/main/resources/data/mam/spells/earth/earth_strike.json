@@ -1,0 +1,27 @@
+{
+  "id": "mam:earth_strike",
+  "name": "Earth Strike",
+  "school": "water",
+  "description": "A stone projectile that hits enemies, dealing moderate damage and stunning them temporarily.",
+  "castType": "projectile",
+  "manaCost": 13.0,
+  "castTime": 1.0,
+  "cooldown": 5.0,
+  "tier": 1,
+  "requiredLevel": 2,
+  "damage": 4.0,
+  "range": 40.0,
+  "projectileSpeed": 1.5,
+  "aoeRadius": 5.0,
+  "knockback": 2.0,
+  "statusEffects": [{ "effect": "stun", "duration": 40, "amplifier": 1 }],
+  "customData": {
+    "width": 3.0
+  },
+  "sound": "block.stone.break",
+  "vfx": {
+    "particleType": "block",
+	"particleCount": 50,
+    "color": "696969"
+  }
+}

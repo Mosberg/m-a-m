@@ -1,0 +1,55 @@
+{
+  "_comment": "Mana And Magic - English (US) Translations",
+
+  "itemGroup.mam.magic": "Mana & Magic",
+
+  "item.mam.peridot": "Peridot",
+  "item.mam.moonstone": "Moonstone",
+  "item.mam.ruby": "Ruby",
+  "item.mam.sapphire": "Sapphire",
+
+  "item.mam.staff_novice": "Novice Staff",
+  "item.mam.staff_apprentice": "Apprentice Staff",
+  "item.mam.staff_adept": "Adept Staff",
+  "item.mam.staff_master": "Master Staff",
+
+  "item.mam.spellbook_novice": "Novice Spellbook",
+  "item.mam.spellbook_apprentice": "Apprentice Spellbook",
+  "item.mam.spellbook_adept": "Adept Spellbook",
+  "item.mam.spellbook_master": "Master Spellbook",
+
+  "item.mam.projectile_air": "Air Projectile",
+  "item.mam.projectile_earth": "Earth Projectile",
+  "item.mam.projectile_fire": "Fire Projectile",
+  "item.mam.projectile_water": "Water Projectile",
+
+  "spell.mam.school.air": "Air",
+  "spell.mam.school.earth": "Earth",
+  "spell.mam.school.fire": "Fire",
+  "spell.mam.school.water": "Water",
+
+  "mana.mam.pool.personal": "Personal Mana",
+  "mana.mam.pool.aura": "Aura Mana",
+  "mana.mam.pool.reserve": "Reserve Mana",
+
+  "tooltip.mam.staff.tier": "Tier: %s",
+  "tooltip.mam.staff.school": "School: %s",
+  "tooltip.mam.staff.durability": "Durability: %d/%d",
+  "tooltip.mam.spellbook.tier": "Tier: %s",
+  "tooltip.mam.spellbook.school": "Contains %s spells",
+  "tooltip.mam.spellbook.durability": "Durability: %d/%d",
+  "tooltip.mam.gemstone.rarity": "Rarity: %s",
+  "tooltip.mam.gemstone.schools": "Schools: %s",
+
+  "key.mam.open_spell_menu": "Open Spell Menu",
+  "key.mam.toggle_hud": "Toggle HUD",
+  "key.mam.cycle_schools": "Cycle Spell Schools",
+
+  "hud.mam.mana.personal": "Personal",
+  "hud.mam.mana.aura": "Aura",
+  "hud.mam.mana.reserve": "Reserve",
+
+  "message.mam.spell.cooldown": "Spell on cooldown: %.1fs remaining",
+  "message.mam.spell.insufficient_mana": "Insufficient mana! Need %.1f, have %.1f",
+  "message.mam.spell.learned": "Learned spell: %s"
+}
