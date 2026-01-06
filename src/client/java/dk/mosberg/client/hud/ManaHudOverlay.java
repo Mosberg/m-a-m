@@ -1,6 +1,6 @@
 package dk.mosberg.client.hud;
 
-import dk.mosberg.client.ClientManaData;
+import dk.mosberg.client.network.ClientManaData;
 import dk.mosberg.mana.ManaPool;
 import dk.mosberg.mana.ManaPoolType;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;

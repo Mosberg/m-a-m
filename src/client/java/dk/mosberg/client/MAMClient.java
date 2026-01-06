@@ -1,6 +1,9 @@
 package dk.mosberg.client;
 
 import dk.mosberg.client.hud.ManaHudOverlay;
+import dk.mosberg.client.input.MagicKeyBindings;
+import dk.mosberg.client.network.ClientNetworkHandler;
+import dk.mosberg.client.network.StaffCastingHandler;
 import dk.mosberg.client.render.SpellProjectileEntityRenderer;
 import dk.mosberg.config.ClientConfig;
 import dk.mosberg.entity.MAMEntities;
@@ -24,5 +27,11 @@ public class MAMClient implements ClientModInitializer {
 
 		// Register client network handlers
 		ClientNetworkHandler.register();
+
+		// Register key bindings
+		MagicKeyBindings.register();
+
+		// Register spellbook casting handler
+		StaffCastingHandler.register();
 	}
 }

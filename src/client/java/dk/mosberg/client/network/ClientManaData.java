@@ -1,4 +1,4 @@
-package dk.mosberg.client;
+package dk.mosberg.client.network;
 
 import dk.mosberg.mana.ManaPoolType;
 import dk.mosberg.mana.PlayerManaData;

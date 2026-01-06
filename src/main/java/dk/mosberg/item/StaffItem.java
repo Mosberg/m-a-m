@@ -14,7 +14,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
 /**
- * Staff item for casting spells.
+ * Staff item that provides buffs to spells when equipped.
  */
 public class StaffItem extends Item {
     private final int tier;
@@ -26,27 +26,11 @@ public class StaffItem extends Item {
 
     @Override
     public ActionResult use(World world, PlayerEntity player, Hand hand) {
-        ItemStack stack = player.getStackInHand(hand);
-
-        // Get selected spell from NBT
-        String spellIdStr = stack.get(MAMDataComponents.SELECTED_SPELL);
-
-        if (spellIdStr == null || spellIdStr.isEmpty()) {
-            if (world.isClient()) {
-                player.sendMessage(Text.translatable("item.mam.staff.no_spell"), true);
-            }
-            return ActionResult.FAIL;
+        // Staff is a passive buff item, doesn't cast spells
+        if (world.isClient()) {
+            player.sendMessage(Text.translatable("item.mam.staff.passive_item"), true);
         }
-
-        Identifier spellId = Identifier.tryParse(spellIdStr);
-        if (spellId == null) {
-            return ActionResult.FAIL;
-        }
-
-        if (!world.isClient()) {
-            player.getItemCooldownManager().set(stack, 20); // 1 second cooldown
-        }
-        return ActionResult.SUCCESS;
+        return ActionResult.PASS;
     }
 
     @Override
@@ -69,13 +53,13 @@ public class StaffItem extends Item {
      * Gets available spells for this staff based on bound gemstone.
      */
     public static List<Spell> getAvailableSpells(ItemStack stack) {
-        int tier = stack.get(MAMDataComponents.TIER);
+        Integer tierValue = stack.get(MAMDataComponents.TIER);
         SpellSchool school = stack.get(MAMDataComponents.SPELL_SCHOOL);
 
-        if (school == null) {
+        if (tierValue == null || school == null) {
             return List.of();
         }
 
-        return SpellRegistry.getSpellsBySchoolAndMaxTier(school, tier);
+        return SpellRegistry.getSpellsBySchoolAndMaxTier(school, tierValue);
     }
 }

@@ -119,4 +119,17 @@ public class SpellRegistry {
                 .filter(spell -> spell.getSchool() == school && spell.getTier() <= maxTier)
                 .sorted(Comparator.comparingInt(Spell::getTier)).toList();
     }
+
+    /**
+     * Get all spells across all schools up to a maximum tier level
+     * 
+     * @param maxTier Maximum tier level (inclusive)
+     * @return List of spells sorted by tier
+     */
+    public static List<Spell> getSpellsByMaxTier(int maxTier) {
+        return SPELLS.values().stream().filter(spell -> spell.getTier() <= maxTier)
+                .sorted(Comparator.comparingInt(Spell::getTier)
+                        .thenComparing(spell -> spell.getSchool().toString()))
+                .toList();
+    }
 }

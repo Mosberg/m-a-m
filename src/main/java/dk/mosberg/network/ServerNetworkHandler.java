@@ -1,12 +1,15 @@
 package dk.mosberg.network;
 
 import dk.mosberg.MAM;
+import dk.mosberg.item.SpellbookItem;
 import dk.mosberg.mana.ManaAttachments;
 import dk.mosberg.mana.ManaPoolType;
 import dk.mosberg.mana.PlayerManaData;
 import dk.mosberg.spell.SpellCaster;
 import dk.mosberg.spell.SpellRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Identifier;
 
 /**
  * Registers server-side packet handlers.
@@ -29,17 +32,39 @@ public class ServerNetworkHandler {
             });
         });
 
-        // Handle spell selection from spellbook GUI
+        // Handle spell selection from spell GUI
         ServerPlayNetworking.registerGlobalReceiver(SelectSpellPayload.ID, (payload, context) -> {
             context.server().execute(() -> {
                 var player = context.player();
                 var spell = SpellRegistry.getSpell(payload.spellId());
 
                 if (spell.isPresent()) {
-                    // Store selected spell in player data or item NBT
-                    // For now, just log the selection
-                    MAM.LOGGER.debug("Player {} selected spell: {}", player.getName().getString(),
-                            spell.get().getName());
+                    // Find spellbook in player's hands or inventory
+                    ItemStack spellbook = ItemStack.EMPTY;
+                    if (player.getMainHandStack().getItem() instanceof SpellbookItem) {
+                        spellbook = player.getMainHandStack();
+                    } else if (player.getOffHandStack().getItem() instanceof SpellbookItem) {
+                        spellbook = player.getOffHandStack();
+                    } else {
+                        // Search inventory for spellbook
+                        for (int i = 0; i < player.getInventory().size(); i++) {
+                            ItemStack stack = player.getInventory().getStack(i);
+                            if (stack.getItem() instanceof SpellbookItem) {
+                                spellbook = stack;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!spellbook.isEmpty()) {
+                        Identifier spellId = payload.spellId();
+                        SpellbookItem.setSelectedSpell(spellbook, spellId);
+                        MAM.LOGGER.info("Spell {} bound to spellbook for player {}",
+                                spell.get().getName(), player.getName().getString());
+                    } else {
+                        MAM.LOGGER.warn("Player {} selected spell but has no spellbook",
+                                player.getName().getString());
+                    }
                 } else {
                     MAM.LOGGER.warn("Player {} tried to select unknown spell: {}",
                             player.getName().getString(), payload.spellId());

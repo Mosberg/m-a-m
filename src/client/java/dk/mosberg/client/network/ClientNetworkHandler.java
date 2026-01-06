@@ -1,4 +1,4 @@
-package dk.mosberg.client;
+package dk.mosberg.client.network;
 
 import dk.mosberg.MAM;
 import dk.mosberg.client.gui.SpellScreenHelper;
