@@ -498,6 +498,7 @@ public class SpellCaster {
     /**
      * Records synergy with nearby players for combo bonuses.
      */
+    @SuppressWarnings("null")
     private static void recordSynergyWithNearbyPlayers(ServerPlayerEntity player, Spell spell,
             PlayerCastingData castingData) {
         ServerWorld world = (ServerWorld) player.getEntityWorld();
