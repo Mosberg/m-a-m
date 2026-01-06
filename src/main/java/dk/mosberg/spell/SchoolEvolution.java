@@ -54,6 +54,7 @@ public class SchoolEvolution {
      * Map of school to evolution unlocks by tier. Tier 1 = no evolutions (base), Tier 2+ = unlocked
      * evolutions
      */
+    @SuppressWarnings("null")
     private static final Map<SpellSchool, Map<Integer, EvolutionType>> EVOLUTION_UNLOCKS =
             new EnumMap<>(SpellSchool.class);
 

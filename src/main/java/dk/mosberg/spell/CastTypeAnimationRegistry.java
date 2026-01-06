@@ -159,6 +159,7 @@ public class CastTypeAnimationRegistry {
      * <p>
      * Called during mod initialization.
      */
+    @SuppressWarnings("null")
     public static void registerDefaults() {
         MAM.LOGGER.info("Registering default cast type animations");
 

@@ -488,6 +488,7 @@ public class SpellProjectileEntity extends ProjectileEntity implements FlyingIte
         Vec3d currentPos = new Vec3d(this.getX(), this.getY(), this.getZ());
         Box searchBox = new Box(currentPos.subtract(homingRadius, homingRadius, homingRadius),
                 currentPos.add(homingRadius, homingRadius, homingRadius));
+        @SuppressWarnings("null")
         List<LivingEntity> entities = serverWorld.getEntitiesByClass(LivingEntity.class, searchBox,
                 entity -> entity != this.getOwner() && entity.isAlive()
                         && !hitEntities.contains(entity.getUuid()));
@@ -545,6 +546,7 @@ public class SpellProjectileEntity extends ProjectileEntity implements FlyingIte
         if (frostTrail) {
             // Apply slowness to nearby entities
             Box areaBox = new Box(currentPos.subtract(2, 2, 2), currentPos.add(2, 2, 2));
+            @SuppressWarnings("null")
             List<LivingEntity> nearby = serverWorld.getEntitiesByClass(LivingEntity.class, areaBox,
                     entity -> entity != this.getOwner());
 
@@ -565,6 +567,7 @@ public class SpellProjectileEntity extends ProjectileEntity implements FlyingIte
             // Ignite entities
             Box areaBox =
                     new Box(currentPos.subtract(1.5, 1.5, 1.5), currentPos.add(1.5, 1.5, 1.5));
+            @SuppressWarnings("null")
             List<LivingEntity> nearby = serverWorld.getEntitiesByClass(LivingEntity.class, areaBox,
                     entity -> entity != this.getOwner());
 
@@ -587,6 +590,7 @@ public class SpellProjectileEntity extends ProjectileEntity implements FlyingIte
         Vec3d currentPos = new Vec3d(this.getX(), this.getY(), this.getZ());
         Box searchBox = new Box(currentPos.subtract(proximityRange, proximityRange, proximityRange),
                 currentPos.add(proximityRange, proximityRange, proximityRange));
+        @SuppressWarnings("null")
         List<LivingEntity> nearby = serverWorld.getEntitiesByClass(LivingEntity.class, searchBox,
                 entity -> entity != this.getOwner());
 
@@ -616,6 +620,7 @@ public class SpellProjectileEntity extends ProjectileEntity implements FlyingIte
                 new Vec3d(currentTarget.getX(), currentTarget.getY(), currentTarget.getZ());
         Box searchBox = new Box(targetPos.subtract(chainRadius, chainRadius, chainRadius),
                 targetPos.add(chainRadius, chainRadius, chainRadius));
+        @SuppressWarnings("null")
         List<LivingEntity> entities = serverWorld.getEntitiesByClass(LivingEntity.class, searchBox,
                 entity -> entity != this.getOwner() && entity != currentTarget
                         && !hitEntities.contains(entity.getUuid()) && entity.isAlive());
