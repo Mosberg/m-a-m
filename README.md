@@ -1,4 +1,4 @@
-# Minecraft 1.21.11 - Fabric Mod Development Guide
+# Minecraft 1.21.11 - Mana And Magic (Fabric)
 
 ## Minecraft 1.21.11 Fabric Project Overview and Setup
 
