@@ -10,7 +10,9 @@ import dk.mosberg.entity.MAMEntities;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 
+@SuppressWarnings("deprecation")
 public class MAMClient implements ClientModInitializer {
+	@SuppressWarnings("null")
 	@Override
 	public void onInitializeClient() {
 		// This entrypoint is suitable for setting up client-specific logic, such as rendering.
@@ -20,7 +22,7 @@ public class MAMClient implements ClientModInitializer {
 
 		// Register entity renderers
 		EntityRendererRegistry.register(MAMEntities.SPELL_PROJECTILE,
-				SpellProjectileEntityRenderer::new);
+				context -> new SpellProjectileEntityRenderer(context));
 
 		// Register HUD overlay
 		ManaHudOverlay.register();

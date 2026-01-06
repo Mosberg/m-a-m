@@ -17,32 +17,28 @@ import net.minecraft.util.Identifier;
 @Environment(EnvType.CLIENT)
 public class StaffCastingHandler {
 
+    @SuppressWarnings("null")
+    private static final UseItemCallback SPELL_CASTING_CALLBACK = (player, world, hand) -> {
+        if (!world.isClient()) {
+            return ActionResult.PASS;
+        }
+
+        ItemStack stack = player.getStackInHand(hand);
+        if (!(stack.getItem() instanceof SpellbookItem)) {
+            return ActionResult.PASS;
+        }
+
+        Identifier spellId = SpellbookItem.getSelectedSpell(stack);
+        if (spellId != null) {
+            ClientPlayNetworking.send(new CastSpellPayload(spellId));
+        }
+        return ActionResult.PASS;
+    };
+
     /**
      * Register the spellbook casting handler.
      */
     public static void register() {
-        UseItemCallback.EVENT.register((player, world, hand) -> {
-            if (!world.isClient()) {
-                return ActionResult.PASS;
-            }
-
-            ItemStack stack = player.getStackInHand(hand);
-
-            // Check if player is using a spellbook
-            if (!(stack.getItem() instanceof SpellbookItem)) {
-                return ActionResult.PASS;
-            }
-
-            // Get selected spell from spellbook
-            Identifier spellId = SpellbookItem.getSelectedSpell(stack);
-            if (spellId == null) {
-                return ActionResult.PASS;
-            }
-
-            // Send cast spell packet to server
-            ClientPlayNetworking.send(new CastSpellPayload(spellId));
-
-            return ActionResult.PASS;
-        });
+        UseItemCallback.EVENT.register(SPELL_CASTING_CALLBACK);
     }
 }

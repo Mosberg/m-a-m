@@ -32,6 +32,7 @@ public class ClientConfig {
         return INSTANCE;
     }
 
+    @SuppressWarnings("null")
     private static ClientConfig load() {
         if (Files.exists(CONFIG_PATH)) {
             try {

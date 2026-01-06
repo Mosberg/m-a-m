@@ -2,12 +2,14 @@ package dk.mosberg.mana;
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Objects;
 import net.minecraft.nbt.NbtCompound;
 
 /**
  * Holds the three-pool mana system data for a player.
  */
 public class PlayerManaData {
+    @SuppressWarnings("null")
     private final Map<ManaPoolType, ManaPool> pools = new EnumMap<>(ManaPoolType.class);
     private ManaPoolType activePriority = ManaPoolType.PERSONAL;
 
@@ -26,13 +28,13 @@ public class PlayerManaData {
      */
     public boolean consumeMana(float amount) {
         // Try active priority pool first
-        if (pools.get(activePriority).consume(amount)) {
+        if (getPool(activePriority).consume(amount)) {
             return true;
         }
 
         // Try other pools in order: Personal -> Aura -> Reserve
         for (ManaPoolType type : ManaPoolType.values()) {
-            if (type != activePriority && pools.get(type).consume(amount)) {
+            if (type != activePriority && getPool(type).consume(amount)) {
                 return true;
             }
         }
@@ -48,7 +50,7 @@ public class PlayerManaData {
     }
 
     public ManaPool getPool(ManaPoolType type) {
-        return pools.get(type);
+        return Objects.requireNonNull(pools.get(type), "Missing mana pool for type " + type);
     }
 
     public ManaPoolType getActivePriority() {
@@ -56,13 +58,15 @@ public class PlayerManaData {
     }
 
     public void setActivePriority(ManaPoolType priority) {
-        this.activePriority = priority;
+        this.activePriority = Objects.requireNonNull(priority, "Priority cannot be null");
     }
 
+    @SuppressWarnings("null")
     public float getTotalMana() {
         return pools.values().stream().map(ManaPool::getCurrentMana).reduce(0f, Float::sum);
     }
 
+    @SuppressWarnings("null")
     public float getTotalCapacity() {
         return pools.values().stream().map(ManaPool::getMaxCapacity).reduce(0, Integer::sum);
     }

@@ -1,5 +1,6 @@
 package dk.mosberg.client.hud;
 
+import org.jetbrains.annotations.NotNull;
 import dk.mosberg.client.network.ClientManaData;
 import dk.mosberg.mana.ManaPool;
 import dk.mosberg.mana.ManaPoolType;
@@ -11,21 +12,28 @@ import net.minecraft.client.render.RenderTickCounter;
 /**
  * Renders the three-tier mana bars in the HUD.
  */
+@SuppressWarnings("deprecation")
 public class ManaHudOverlay implements HudRenderCallback {
 
     private static final int BAR_WIDTH = 81;
     private static final int BAR_HEIGHT = 9;
     private static final int BAR_SPACING = 2;
+    private static volatile boolean enabled = true;
 
     public static void register() {
         HudRenderCallback.EVENT.register(new ManaHudOverlay());
     }
 
+    public static void toggle() {
+        enabled = !enabled;
+    }
+
     @Override
-    public void onHudRender(DrawContext drawContext, RenderTickCounter tickCounter) {
+    public void onHudRender(@SuppressWarnings("null") @NotNull DrawContext drawContext,
+            @SuppressWarnings("null") @NotNull RenderTickCounter tickCounter) {
         MinecraftClient client = MinecraftClient.getInstance();
 
-        if (client.player == null || client.options.hudHidden) {
+        if (!enabled || client.player == null || client.options.hudHidden) {
             return;
         }
 

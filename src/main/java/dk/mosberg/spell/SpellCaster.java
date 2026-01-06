@@ -1,5 +1,6 @@
 package dk.mosberg.spell;
 
+import java.util.Objects;
 import dk.mosberg.MAM;
 import dk.mosberg.entity.SpellProjectileEntity;
 import dk.mosberg.mana.ManaAttachments;
@@ -18,8 +19,10 @@ import net.minecraft.text.Text;
 public class SpellCaster {
 
     public static void castSpell(ServerPlayerEntity player, Spell spell) {
-        PlayerManaData manaData =
-                player.getAttachedOrCreate(ManaAttachments.PLAYER_MANA, PlayerManaData::new);
+        @SuppressWarnings("null")
+        PlayerManaData manaData = Objects.requireNonNull(
+                player.getAttachedOrCreate(ManaAttachments.PLAYER_MANA, PlayerManaData::new),
+                "Player mana attachment should always exist");
 
         // Check mana cost
         if (!manaData.consumeMana(spell.getManaCost())) {

@@ -10,8 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import org.jetbrains.annotations.NotNull;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.JsonOps;
@@ -29,18 +28,21 @@ import net.minecraft.util.Identifier;
  */
 public class SpellRegistry {
     private static final Map<Identifier, Spell> SPELLS = new HashMap<>();
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static int cachedMaxTier = -1;
+    private static List<Spell> cachedMaxTierList;
 
+    @SuppressWarnings("deprecation")
     public static void register() {
         ResourceManagerHelper.get(ResourceType.SERVER_DATA)
                 .registerReloadListener(new SimpleSynchronousResourceReloadListener() {
+                    @SuppressWarnings("null")
                     @Override
-                    public Identifier getFabricId() {
+                    public @NotNull Identifier getFabricId() {
                         return Identifier.of(MAM.MOD_ID, "spells");
                     }
 
                     @Override
-                    public void reload(ResourceManager manager) {
+                    public void reload(@NotNull ResourceManager manager) {
                         loadSpells(manager);
                     }
                 });
@@ -54,6 +56,8 @@ public class SpellRegistry {
 
     private static void loadSpells(ResourceManager manager) {
         SPELLS.clear();
+        cachedMaxTier = -1;
+        cachedMaxTierList = null;
         int loaded = 0;
         int failed = 0;
 
@@ -106,11 +110,15 @@ public class SpellRegistry {
     }
 
     public static List<Spell> getSpellsBySchool(SpellSchool school) {
+        if (SPELLS.isEmpty())
+            return List.of();
         return SPELLS.values().stream().filter(spell -> spell.getSchool() == school)
                 .sorted(Comparator.comparingInt(Spell::getTier)).toList();
     }
 
     public static List<Spell> getSpellsByTier(int tier) {
+        if (SPELLS.isEmpty())
+            return List.of();
         return SPELLS.values().stream().filter(spell -> spell.getTier() == tier).toList();
     }
 
@@ -121,15 +129,24 @@ public class SpellRegistry {
     }
 
     /**
-     * Get all spells across all schools up to a maximum tier level
-     * 
+     * Get all spells across all schools up to a maximum tier level (cached for performance)
+     *
      * @param maxTier Maximum tier level (inclusive)
      * @return List of spells sorted by tier
      */
     public static List<Spell> getSpellsByMaxTier(int maxTier) {
-        return SPELLS.values().stream().filter(spell -> spell.getTier() <= maxTier)
+        // Cache result for repeated queries with same tier
+        if (cachedMaxTier == maxTier && cachedMaxTierList != null) {
+            return cachedMaxTierList;
+        }
+
+        List<Spell> result = SPELLS.values().stream().filter(spell -> spell.getTier() <= maxTier)
                 .sorted(Comparator.comparingInt(Spell::getTier)
                         .thenComparing(spell -> spell.getSchool().toString()))
                 .toList();
+
+        cachedMaxTier = maxTier;
+        cachedMaxTierList = result;
+        return result;
     }
 }

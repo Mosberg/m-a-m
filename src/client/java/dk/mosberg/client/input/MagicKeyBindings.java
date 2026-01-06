@@ -41,20 +41,12 @@ public class MagicKeyBindings {
                         net.minecraft.client.option.KeyBinding.Category.MISC));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (client == null) {
-                return;
+            while (openSpellKey.wasPressed()) {
+                openSpellSelectionScreen(client);
             }
 
-            if (openSpellKey != null) {
-                while (openSpellKey.wasPressed()) {
-                    openSpellSelectionScreen(client);
-                }
-            }
-
-            if (toggleHudKey != null) {
-                while (toggleHudKey.wasPressed()) {
-                    toggleHUD();
-                }
+            while (toggleHudKey.wasPressed()) {
+                toggleHUD();
             }
         });
 
@@ -65,42 +57,34 @@ public class MagicKeyBindings {
      * Open the spell selection screen.
      */
     public static void openSpellSelectionScreen(MinecraftClient client) {
-        if (client == null || client.player == null || client.currentScreen != null) {
+        if (client.currentScreen != null)
             return;
-        }
 
-        if (client.player.isSpectator() || client.player.isDead()) {
+        var player = client.player;
+        if (player == null || player.isSpectator() || player.isDead())
             return;
-        }
 
-        // Check if player has spellbook in either hand
-        ItemStack mainHand = client.player.getMainHandStack();
-        ItemStack offHand = client.player.getOffHandStack();
-        ItemStack spellbook = ItemStack.EMPTY;
-        int spellbookTier = 0;
+        // Check main hand first (more common case)
+        ItemStack mainHand = player.getMainHandStack();
+        int spellbookTier;
 
-        // Check main hand
         if (mainHand.getItem() instanceof SpellbookItem spellbookItem) {
-            spellbook = mainHand;
             spellbookTier = spellbookItem.getTier();
+        } else {
+            // Check off hand
+            ItemStack offHand = player.getOffHandStack();
+            if (offHand.getItem() instanceof SpellbookItem spellbookItem) {
+                spellbookTier = spellbookItem.getTier();
+            } else {
+                player.sendMessage(Text.translatable("message.mam.no_spellbook"), true);
+                return;
+            }
         }
 
-        // Check off hand if not found in main hand
-        if (spellbook.isEmpty() && offHand.getItem() instanceof SpellbookItem spellbookItem) {
-            spellbook = offHand;
-            spellbookTier = spellbookItem.getTier();
-        }
-
-        // Validate we have spellbook
-        if (spellbook.isEmpty()) {
-            client.player.sendMessage(Text.translatable("message.mam.no_spellbook"), true);
-            return;
-        }
-
-        // Get all spells up to spellbook tier (all schools)
+        // Get spells with cached lookup
         List<Spell> spells = SpellRegistry.getSpellsByMaxTier(spellbookTier);
         if (spells.isEmpty()) {
-            client.player.sendMessage(Text.translatable("message.mam.no_spells"), true);
+            player.sendMessage(Text.translatable("message.mam.no_spells"), true);
             return;
         }
 
@@ -112,7 +96,6 @@ public class MagicKeyBindings {
      * Toggle HUD visibility.
      */
     public static void toggleHUD() {
-        // TODO: Implement HUD visibility toggle
-        MAM.LOGGER.info("HUD toggle pressed (feature coming soon)");
+        dk.mosberg.client.hud.ManaHudOverlay.toggle();
     }
 }

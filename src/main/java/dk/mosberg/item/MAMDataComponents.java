@@ -15,6 +15,7 @@ import net.minecraft.util.Identifier;
 public class MAMDataComponents {
 
     // Component for spell school binding on gemstones
+    @SuppressWarnings("null")
     public static final ComponentType<SpellSchool> SPELL_SCHOOL = Registry.register(
             Registries.DATA_COMPONENT_TYPE, Identifier.of(MAM.MOD_ID, "spell_school"),
             ComponentType.<SpellSchool>builder()

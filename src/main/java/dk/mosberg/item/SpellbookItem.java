@@ -26,7 +26,7 @@ public class SpellbookItem extends Item {
 
     /**
      * Set the selected spell on a spellbook
-     * 
+     *
      * @param spellbook The spellbook item stack
      * @param spellId The spell identifier to set
      */
@@ -36,7 +36,7 @@ public class SpellbookItem extends Item {
 
     /**
      * Get the selected spell from a spellbook
-     * 
+     *
      * @param spellbook The spellbook item stack
      * @return The selected spell identifier, or null if none selected
      */
@@ -62,10 +62,5 @@ public class SpellbookItem extends Item {
         // Server handles spell casting via network handler
         // Client sends packet in StaffCastingHandler
         return ActionResult.SUCCESS;
-    }
-
-    @Override
-    public Text getName(ItemStack stack) {
-        return super.getName(stack);
     }
 }

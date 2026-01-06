@@ -1,5 +1,6 @@
 package dk.mosberg.network;
 
+import org.jetbrains.annotations.NotNull;
 import dk.mosberg.MAM;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.network.RegistryByteBuf;
@@ -19,10 +20,11 @@ public record SelectSpellPayload(Identifier spellId) implements CustomPayload {
             .tuple(Identifier.PACKET_CODEC, SelectSpellPayload::spellId, SelectSpellPayload::new);
 
     @Override
-    public Id<? extends CustomPayload> getId() {
+    public @NotNull Id<? extends CustomPayload> getId() {
         return ID;
     }
 
+    @SuppressWarnings("null")
     public static void register() {
         PayloadTypeRegistry.playC2S().register(ID, CODEC);
         MAM.LOGGER.info("Registered SelectSpellPayload");

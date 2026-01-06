@@ -11,6 +11,17 @@
 - Fabric Loom 1.14.10 with split source sets
 - Java 21 toolchain with G1GC optimization
 
+## Features
+
+- **Spell Schools & Spells:** Air, Earth, Fire, Water schools with data-driven spells (JSON under `data/mam/spells/**`), currently including the four strike projectiles.
+- **Items & Progression:** Four-tier spellbooks (novice → master) for casting; staffs act as optional passive buffs; four gemstones (ruby, sapphire, moonstone, peridot) bound to schools; assets under `assets/mam` with models/textures.
+- **Casting Flow:** Hold a spellbook, press `R` to open the spell selection GUI, right-click to cast the selected spell. Spell availability respects the spellbook tier.
+- **Mana System:** Three-pool mana (personal, aura, reserve) with regeneration, attachments via Fabric Data Attachments (`PlayerManaData`) and HUD overlay (toggle key placeholder implemented).
+- **Entities & Rendering:** Custom `SpellProjectileEntity` with school-based textures and renderer; keybindings and HUD registered in the client entrypoint.
+- **Networking:** Custom payloads for casting, selection, opening spellbook UI, and mana sync (`CastSpellPayload`, `SelectSpellPayload`, `OpenSpellBookPayload`, `ManaSyncPayload`); server handler routes selections to the held spellbook.
+- **Architecture:** Strict split source sets (`src/main` common/server, `src/client` client-only). Client code may depend on common; server never imports client. Data-driven content and registry helpers live in `dk.mosberg` packages.
+- **Build & Datagen:** Gradle tasks for client/server runs, build, and data generation; metadata sourced from `gradle.properties` (do not edit `fabric.mod.json` directly).
+
 ### Gradle Properties
 
 **gradle.properties**

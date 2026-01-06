@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
  */
 public class ClientNetworkHandler {
 
+    @SuppressWarnings("null")
     public static void register() {
         // Handle mana sync from server
         ClientPlayNetworking.registerGlobalReceiver(ManaSyncPayload.ID, (payload, context) -> {

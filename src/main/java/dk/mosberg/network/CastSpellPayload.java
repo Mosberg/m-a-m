@@ -1,11 +1,10 @@
 package dk.mosberg.network;
 
+import org.jetbrains.annotations.NotNull;
 import dk.mosberg.MAM;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Identifier;
 
@@ -21,10 +20,11 @@ public record CastSpellPayload(Identifier spellId) implements CustomPayload {
             .tuple(Identifier.PACKET_CODEC, CastSpellPayload::spellId, CastSpellPayload::new);
 
     @Override
-    public Id<? extends CustomPayload> getId() {
+    public @NotNull Id<? extends CustomPayload> getId() {
         return ID;
     }
 
+    @SuppressWarnings("null")
     public static void register() {
         PayloadTypeRegistry.playC2S().register(ID, CODEC);
         MAM.LOGGER.info("Registered CastSpellPayload");

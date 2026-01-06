@@ -1,5 +1,6 @@
 package dk.mosberg.network;
 
+import java.util.Objects;
 import dk.mosberg.MAM;
 import dk.mosberg.item.SpellbookItem;
 import dk.mosberg.mana.ManaAttachments;
@@ -16,6 +17,7 @@ import net.minecraft.util.Identifier;
  */
 public class ServerNetworkHandler {
 
+    @SuppressWarnings("null")
     public static void register() {
         // Handle spell casting from client
         ServerPlayNetworking.registerGlobalReceiver(CastSpellPayload.ID, (payload, context) -> {
@@ -79,8 +81,10 @@ public class ServerNetworkHandler {
      * Sends mana data to a client.
      */
     public static void syncManaToClient(net.minecraft.server.network.ServerPlayerEntity player) {
-        PlayerManaData manaData =
-                player.getAttachedOrCreate(ManaAttachments.PLAYER_MANA, PlayerManaData::new);
+        @SuppressWarnings("null")
+        PlayerManaData manaData = Objects.requireNonNull(
+                player.getAttachedOrCreate(ManaAttachments.PLAYER_MANA, PlayerManaData::new),
+                "Player mana attachment should always exist");
 
         ManaSyncPayload payload =
                 new ManaSyncPayload(manaData.getPool(ManaPoolType.PERSONAL).getCurrentMana(),

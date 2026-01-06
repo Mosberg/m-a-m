@@ -92,6 +92,7 @@ public class MAM implements ModInitializer {
 					RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "spellbook_master"))),
 					4));
 
+	@SuppressWarnings("null")
 	@Override
 	public void onInitialize() {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.

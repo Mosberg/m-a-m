@@ -13,9 +13,11 @@ import net.minecraft.util.Identifier;
  */
 public class Spell {
 
+    @SuppressWarnings({"unused", "null"})
     private static final Codec<SpellSchool> SCHOOL_CODEC = Codec.STRING
             .xmap(s -> SpellSchool.valueOf(s.toUpperCase()), school -> school.name().toLowerCase());
 
+    @SuppressWarnings({"unused", "null"})
     private static final Codec<SpellCastType> CAST_TYPE_CODEC = Codec.STRING.xmap(
             c -> SpellCastType.valueOf(c.toUpperCase()), castType -> castType.name().toLowerCase());
 
@@ -191,6 +193,7 @@ public class Spell {
 
     // Status effect entry for serialization
     public record StatusEffectEntry(String effect, int duration, int amplifier) {
+        @SuppressWarnings("null")
         public static final Codec<StatusEffectEntry> CODEC =
                 RecordCodecBuilder.create(instance -> instance
                         .group(Codec.STRING.fieldOf("effect").forGetter(StatusEffectEntry::effect),
@@ -209,6 +212,7 @@ public class Spell {
 
     // VFX data for spell visual effects
     public record VfxData(String particleType, int particleCount, String color) {
+        @SuppressWarnings("null")
         public static final Codec<VfxData> CODEC = RecordCodecBuilder.create(instance -> instance
                 .group(Codec.STRING.fieldOf("particleType").forGetter(VfxData::particleType),
                         Codec.INT.optionalFieldOf("particleCount", 10)

@@ -46,10 +46,7 @@ public class ManaAttachments {
                         return data;
                     }));
 
-    // NBT-based codec for attachment persistence
-    private static final Codec<PlayerManaData> NBT_CODEC =
-            Codec.STRING.xmap(str -> new PlayerManaData(), data -> "mana");
-
+    @SuppressWarnings({"deprecation", "unchecked", "null"})
     public static final AttachmentType<PlayerManaData> PLAYER_MANA =
             AttachmentRegistry.<PlayerManaData>builder().persistent(new Codec<PlayerManaData>() {
                 @Override
@@ -70,7 +67,6 @@ public class ManaAttachments {
                     if (ops instanceof NbtOps) {
                         NbtCompound nbt = new NbtCompound();
                         input.writeNbt(nbt);
-                        @SuppressWarnings("unchecked")
                         T result = (T) nbt;
                         return com.mojang.serialization.DataResult.success(result);
                     }
@@ -84,6 +80,7 @@ public class ManaAttachments {
 
     // Helper record for codec serialization
     private record PoolData(float current, int max, float regen) {
+        @SuppressWarnings("null")
         public static final Codec<PoolData> CODEC = RecordCodecBuilder.create(instance -> instance
                 .group(Codec.FLOAT.fieldOf("current").forGetter(PoolData::current),
                         Codec.INT.fieldOf("max").forGetter(PoolData::max),
