@@ -14,6 +14,9 @@ import dk.mosberg.network.ManaSyncPayload;
 import dk.mosberg.network.OpenSpellBookPayload;
 import dk.mosberg.network.SelectSpellPayload;
 import dk.mosberg.network.ServerNetworkHandler;
+import dk.mosberg.spell.CastTypeAnimationRegistry;
+import dk.mosberg.spell.HybridSchoolRegistry;
+import dk.mosberg.spell.SpellMigrationRegistry;
 import dk.mosberg.spell.SpellRegistry;
 import dk.mosberg.spell.SpellSchool;
 import net.fabricmc.api.ModInitializer;
@@ -136,6 +139,11 @@ public class MAM implements ModInitializer {
 
 		// Register spell system
 		SpellRegistry.register();
+
+		// Register spell system extensions
+		HybridSchoolRegistry.registerDefaults();
+		CastTypeAnimationRegistry.registerDefaults();
+		SpellMigrationRegistry.registerDefaults();
 
 		// Register networking
 		CastSpellPayload.register();

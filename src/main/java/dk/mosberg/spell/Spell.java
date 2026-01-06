@@ -122,6 +122,7 @@ public class Spell {
                 1);
     }
 
+    @SuppressWarnings("null")
     public Spell(Identifier id, String name, String school, String description, String castType,
             float manaCost, float castTime, float cooldown, int tier, int requiredLevel,
             float damage, float range, float projectileSpeed, float aoeRadius, float knockback,
