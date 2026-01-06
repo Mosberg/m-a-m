@@ -9,7 +9,7 @@ This document contains all TODO items from the codebase organized by implementat
 ### Spell School System
 
 - [x] **SpellSchool.java** - Add school-specific stat modifiers (damage multiplier, mana cost, cooldown)
-- [ ] **SpellSchool.java** - Implement school affinity system (players stronger in certain schools)
+- [x] **SpellSchool.java** - Implement school affinity system (players stronger in certain schools)
 - [x] **SpellSchool.java** - Add school weakness/resistance interactions (rock-paper-scissors style)
 - [ ] **SpellSchool.java** - Implement school-based enchantments (spellbooks/staffs specialize in school)
 - [x] **SpellSchool.java** - Add environmental interactions per school (water floats, fire spreads)
@@ -26,13 +26,13 @@ This document contains all TODO items from the codebase organized by implementat
 - [x] **SpellCastType.java** - Add TRANSFORM type (temporarily changes player form/abilities)
 - [x] **SpellCastType.java** - Implement cast type-specific cooldown multipliers
 - [x] **SpellCastType.java** - Add cast type animations and VFX customization per type
-- [x] **SpellCastType.java** - Implement cast type restrictions by tier/equipment
+- [x] **SpellCastType.java** - Implement cast type restrictions by tier/equipment)
 
 ### Mana Pool System
 
-- [ ] **ManaPoolType.java** - Add fourth pool type for special mechanics (overflow, burnout, or skill-based)
-- [ ] **ManaPoolType.java** - Implement pool affinity system (players born with pool preferences)
-- [ ] **ManaPoolType.java** - Add pool conversion mechanics (convert between pools with penalties)
+- [x] **ManaPoolType.java** - Add fourth pool type for special mechanics (overflow, burnout, or skill-based)
+- [x] **ManaPoolType.java** - Implement pool affinity system (players born with pool preferences)
+- [x] **ManaPoolType.java** - Add pool conversion mechanics (convert between pools with penalties)
 - [ ] **ManaPoolType.java** - Implement pool linking (shared pools for teams/guilds)
 - [ ] **ManaPoolType.java** - Add regional pool type variations (biome-based mana types)
 - [x] **ManaPoolType.java** - Implement pool thresholds for special abilities (unlock at % full)
@@ -42,7 +42,7 @@ This document contains all TODO items from the codebase organized by implementat
 ### Mana Pool Implementation
 
 - [x] **ManaPool.java** - Add temporary capacity modifiers (e.g., buffs increase max capacity)
-- [ ] **ManaPool.java** - Implement conditional regeneration (only regen in specific biomes/dimensions)
+- [x] **ManaPool.java** - Implement conditional regeneration (only regen in specific biomes/dimensions)
 - [x] **ManaPool.java** - Add drain effects (spells/mobs drain mana over time)
 - [x] **ManaPool.java** - Implement overfill mechanics (temporary capacity overflow with penalty)
 - [x] **ManaPool.java** - Add efficiency tracking (waste vs. actual usage ratios)
@@ -54,9 +54,9 @@ This document contains all TODO items from the codebase organized by implementat
 
 - [x] **SpellRegistry.java** - Implement spell validation on load (check required fields)
 - [ ] **SpellRegistry.java** - Add spell compatibility checking (version, dependencies)
-- [ ] **SpellRegistry.java** - Implement hot-reload for spells during development
+- [x] **SpellRegistry.java** - Implement hot-reload for spells during development)
 - [ ] **SpellRegistry.java** - Add spell inheritance/templates system
-- [ ] **SpellRegistry.java** - Implement spell balancing presets (easy, normal, hard)
+- [x] **SpellRegistry.java** - Implement spell balancing presets (easy, normal, hard)
 - [x] **SpellRegistry.java** - Add spell tag system for categorization and filtering
 - [ ] **SpellRegistry.java** - Implement spell compression for network transfer
 - [x] **SpellRegistry.java** - Add spell dependency resolution (spells requiring other spells)
@@ -65,16 +65,16 @@ This document contains all TODO items from the codebase organized by implementat
 
 ### Spell Core Features
 
-- [ ] **Spell.java** - Add spell upgrade/scaling system
+- [x] **Spell.java** - Add spell upgrade/scaling system
 - [ ] **Spell.java** - Add spell combination/fusion recipes
 - [ ] **Spell.java** - Add spell modification system (transmutation)
 - [ ] **Spell.java** - Add spell presets/loadouts
 - [ ] **Spell.java** - Add spell tutorial/guidance system
 - [x] **Spell.java** - Add spell rarity/quality tiers
-- [ ] **Spell.java** - Add spell unlock requirements/progression
+- [x] **Spell.java** - Add spell unlock requirements/progression
 - [x] **Spell.java** - Add conditional spell effects based on environment
 - [ ] **Spell.java** - Add spell animation configuration
-- [ ] **Spell.java** - Add spell sound effect customization
+- [x] **Spell.java** - Add spell sound effect customization
 
 ---
 
@@ -202,30 +202,17 @@ This document contains all TODO items from the codebase organized by implementat
 
 ### Spellbook Items
 
-- [ ] **SpellbookItem.java** - Add spellbook enchantments
-- [ ] **SpellbookItem.java** - Implement experience/leveling system
-- [ ] **SpellbookItem.java** - Add quick-cast feature
-- [ ] **SpellbookItem.java** - Implement spell organization system
-- [ ] **SpellbookItem.java** - Add spell descriptions storage
-- [ ] **SpellbookItem.java** - Implement rarity system
-- [ ] **SpellbookItem.java** - Add passive abilities per tier
-- [ ] **SpellbookItem.java** - Implement custom notes/annotations
 - [ ] **SpellbookItem.java** - Add thematic styling per school
-- [ ] **SpellbookItem.java** - Implement crafting progression
+- [x] **SpellSchool.java** - Implement school affinity system (players stronger in certain schools)
 
 ---
 
-## Phase 5: Networking & Server Configuration
-
-### Network Payloads
-
-- [ ] **CastSpellPayload.java** - Add spell targeting data (target coordinates, entity UUID)
+- [x] **ManaPoolType.java** - Implement pool affinity system (players born with pool preferences)
 - [ ] **CastSpellPayload.java** - Implement spell variant selection (alternate effects/paths)
 - [ ] **CastSpellPayload.java** - Add spell modification flags (empowered, hastened, etc.)
 - [ ] **CastSpellPayload.java** - Support spell chaining (cast in sequence on same payload)
-- [ ] **CastSpellPayload.java** - Add spell prediction data for server validation
-- [ ] **CastSpellPayload.java** - Implement conditional spell casting (if mana > X then cast)
 - [ ] **CastSpellPayload.java** - Add combo tracking (previous spells in sequence)
+- [x] **Spell.java** - Add spell upgrade/scaling system
 
 ### Mana Sync
 

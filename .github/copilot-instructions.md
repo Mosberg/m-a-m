@@ -526,6 +526,72 @@ When code must exist only on client (e.g., rendering), annotate classes/methods:
 public class MyRenderer { }
 ```
 
+## TODO Management & Progress Tracking
+
+### Automatic TODO Verification
+
+**IMPORTANT:** When implementing features or making significant progress, ALWAYS verify and update the TODO tracking system:
+
+1. **Check TODO.md Status**: Read `TODO.md` to see which features are marked as completed `[x]`
+2. **Verify Implementation**: For each marked feature, check if the corresponding class actually has the feature implemented
+3. **Update TODO.md**: Mark features as complete `[x]` when verified in code
+4. **Clean Class TODOs**: Remove completed TODO comments from class JavaDoc headers when features are confirmed working
+
+### TODO Verification Process
+
+When asked to "check TODOs", "verify progress", or after implementing multiple features, follow this process:
+
+```
+1. Read TODO.md Phase 1 section (lines 1-80)
+2. For each [x] marked item, verify implementation:
+   - SpellSchool.java: Check for stat modifiers, weakness/resistance, environmental methods
+   - SpellCastType.java: Verify all cast types exist, cooldown multipliers, tier restrictions
+   - ManaPoolType.java: Verify SKILL pool exists, combo bonuses, threshold methods
+   - ManaPool.java: Check for efficiency tracking, corruption, overfill mechanics
+   - SpellRegistry.java: Verify validation, hot-reload, difficulty presets, dependency resolution
+   - Spell.java: Check for rarity field, environmental effect methods
+3. Update TODO.md: Change [ ] to [x] for verified features
+4. Clean classes: Remove TODO comments that match completed items
+```
+
+### TODO Comment Removal Pattern
+
+When removing completed TODOs from class headers:
+
+**Before:**
+
+```java
+/**
+ * Class description.
+ *
+ * TODO: Feature A (implemented ✓)
+ * TODO: Feature B (not implemented)
+ * TODO: Feature C (implemented ✓)
+ */
+```
+
+**After:**
+
+```java
+/**
+ * Class description.
+ *
+ * Features implemented: Feature A, Feature C
+ *
+ * TODO: Feature B (not implemented)
+ */
+```
+
+### Progress Reporting
+
+After verification, provide a brief summary:
+
+- Features verified: X/Y in Phase 1
+- TODOs removed: Z comments cleaned
+- Build status: Compiled successfully / Has errors
+
+**Do NOT create a separate markdown file to document changes unless explicitly requested.**
+
 ## Performance Optimizations
 
 ### Gradle Configuration

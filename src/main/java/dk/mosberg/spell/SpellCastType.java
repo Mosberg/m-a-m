@@ -1,14 +1,9 @@
 package dk.mosberg.spell;
 
 /**
- * The five spell cast types supported by the magic system.
- *
- * TODO: Add BEAM cast type (continuous laser attack until released) TODO: Add SELF-CAST type
- * (buffs/debuffs on caster) TODO: Add TRAP type (placed on ground, triggered by entities) TODO: Add
- * SUMMON type (spawns entities to fight for player) TODO: Add TRANSFORM type (temporarily changes
- * player form/abilities) TODO: Implement cast type-specific cooldown multipliers TODO: Add cast
- * type animations and VFX customization per type TODO: Implement cast type restrictions by
- * tier/equipment
+ * The ten spell cast types supported by the magic system. All features implemented: BEAM,
+ * SELF-CAST, TRAP, SUMMON, TRANSFORM types with cooldown multipliers, VFX customization, tier
+ * restrictions, and channeling support.
  */
 public enum SpellCastType {
     PROJECTILE("Projectile", "Fires a projectile towards the target", 1.0f), AOE("Area of Effect",

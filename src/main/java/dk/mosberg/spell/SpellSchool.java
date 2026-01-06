@@ -3,13 +3,12 @@ package dk.mosberg.spell;
 /**
  * The four spell schools.
  *
- * TODO: Add school-specific stat modifiers (damage multiplier, mana cost, cooldown) TODO: Implement
- * school affinity system (players stronger in certain schools) TODO: Add school weakness/resistance
- * interactions (rock-paper-scissors style) TODO: Implement school-based enchantments
- * (spellbooks/staffs specialize in school) TODO: Add environmental interactions per school (water
- * floats, fire spreads) TODO: Implement school evolution (higher tiers unlock new mechanics) TODO:
- * Add school combinations (hybrid schools for mixed-element spells) TODO: Implement school
- * prestige/mastery system (unlock bonuses)
+ * Features implemented: School affinity system.
+ *
+ * TODO: Implement school-based enchantments (spellbooks/staffs specialize in school) TODO:
+ * Implement school evolution (higher tiers unlock new mechanics) TODO: Add school combinations
+ * (hybrid schools for mixed-element spells) TODO: Implement school prestige/mastery system (unlock
+ * bonuses)
  */
 public enum SpellSchool {
     AIR("Air", 0x87CEEB, 1.0f, 0.9f, 0.95f), EARTH("Earth", 0x8B4513, 1.2f, 1.1f, 1.2f), FIRE(
@@ -119,7 +118,7 @@ public enum SpellSchool {
 
     /**
      * Check if this school has environmental advantages in the given conditions.
-     * 
+     *
      * @param isRaining Whether it's currently raining
      * @param isUnderwater Whether the caster is underwater
      * @param isInNether Whether the caster is in the Nether
@@ -172,6 +171,63 @@ public enum SpellSchool {
             case AIR -> "Powerful when airborne, weak underwater";
             case EARTH -> "Powerful on solid ground, weak when airborne";
         };
+    }
+
+    /**
+     * Calculate player affinity bonus for this school. Players can have natural affinity for
+     * certain schools (0.8x - 1.3x multiplier).
+     *
+     * @param playerAffinitySchool The school the player has affinity for (null if none)
+     * @param playerAffinityStrength Affinity strength (0.0 = none, 1.0 = max)
+     * @return Affinity multiplier applied to spell effectiveness
+     */
+    public float getAffinityMultiplier(SpellSchool playerAffinitySchool,
+            float playerAffinityStrength) {
+        if (playerAffinitySchool == null || playerAffinityStrength <= 0.0f) {
+            return 1.0f; // No affinity
+        }
+
+        // Clamp strength to 0.0-1.0
+        float strength = Math.max(0.0f, Math.min(1.0f, playerAffinityStrength));
+
+        if (this == playerAffinitySchool) {
+            // Matching affinity: 1.0 + (0.3 * strength) = 1.0-1.3x
+            return 1.0f + (0.3f * strength);
+        }
+
+        // Opposite school (based on weakness cycle)
+        SpellSchool oppositeSchool = getWeakAgainst();
+        if (playerAffinitySchool == oppositeSchool) {
+            // Opposing affinity: 1.0 - (0.2 * strength) = 0.8-1.0x
+            return 1.0f - (0.2f * strength);
+        }
+
+        // Adjacent schools (neutral): minor penalty
+        // 1.0 - (0.1 * strength) = 0.9-1.0x
+        return 1.0f - (0.1f * strength);
+    }
+
+    /**
+     * Get recommended affinity strength for a player starting with this school. Used for character
+     * creation or tutorial guidance.
+     */
+    public static float getRecommendedAffinityStrength(int playerLevel) {
+        if (playerLevel < 10)
+            return 0.3f; // Weak affinity
+        if (playerLevel < 25)
+            return 0.5f; // Moderate affinity
+        if (playerLevel < 50)
+            return 0.7f; // Strong affinity
+        return 1.0f; // Master affinity
+    }
+
+    /**
+     * Check if player can change their school affinity. Affinity becomes locked after significant
+     * progression.
+     */
+    public static boolean canChangeAffinity(int playerLevel, float currentStrength) {
+        // Can only change before level 20 or if affinity is weak
+        return playerLevel < 20 || currentStrength < 0.5f;
     }
 
     public String getTranslationKey() {

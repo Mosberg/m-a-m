@@ -331,16 +331,170 @@ public class Spell {
         return new java.util.ArrayList<>(tags);
     }
 
-    // TODO: Add spell upgrade/scaling system
+    /**
+     * Check if a player meets the unlock requirements for this spell. Requirements: player level >=
+     * requiredLevel, tier access, prerequisite spells learned.
+     *
+     * @param playerLevel Current player level
+     * @param maxTierUnlocked Maximum spell tier the player has unlocked
+     * @param knownSpells List of spell IDs the player has already learned
+     * @return true if player can unlock/learn this spell
+     */
+    public boolean meetsUnlockRequirements(int playerLevel, int maxTierUnlocked,
+            List<Identifier> knownSpells) {
+        // Check level requirement
+        if (playerLevel < requiredLevel) {
+            return false;
+        }
+
+        // Check tier access
+        if (tier > maxTierUnlocked) {
+            return false;
+        }
+
+        // Check prerequisite spells (from tags starting with "requires:")
+        for (String tag : tags) {
+            if (tag.startsWith("requires:")) {
+                String requiredSpellName = tag.substring("requires:".length());
+                Identifier requiredSpellId = Identifier.of(id.getNamespace(), requiredSpellName);
+                if (!knownSpells.contains(requiredSpellId)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Get the list of prerequisite spell IDs required to unlock this spell.
+     */
+    public List<Identifier> getPrerequisiteSpells() {
+        List<Identifier> prerequisites = new java.util.ArrayList<>();
+        for (String tag : tags) {
+            if (tag.startsWith("requires:")) {
+                String requiredSpellName = tag.substring("requires:".length());
+                prerequisites.add(Identifier.of(id.getNamespace(), requiredSpellName));
+            }
+        }
+        return prerequisites;
+    }
+
+    /**
+     * Get the unlock cost for this spell (in experience levels). Higher tier and rarity spells cost
+     * more.
+     */
+    public int getUnlockCost() {
+        int baseCost = tier * 5; // Tier 1 = 5 levels, Tier 4 = 20 levels
+        float rarityMultiplier = switch (rarity) {
+            case COMMON -> 1.0f;
+            case UNCOMMON -> 1.2f;
+            case RARE -> 1.5f;
+            case EPIC -> 2.0f;
+            case LEGENDARY -> 3.0f;
+        };
+        return (int) (baseCost * rarityMultiplier);
+    }
+
+    /**
+     * Get a description of why the spell is locked (for UI display).
+     */
+    public String getUnlockRequirementDescription(int playerLevel, int maxTierUnlocked,
+            List<Identifier> knownSpells) {
+        if (playerLevel < requiredLevel) {
+            return "Requires level " + requiredLevel + " (current: " + playerLevel + ")";
+        }
+        if (tier > maxTierUnlocked) {
+            return "Requires tier " + tier + " access (current max: " + maxTierUnlocked + ")";
+        }
+
+        List<Identifier> prerequisites = getPrerequisiteSpells();
+        for (Identifier prereq : prerequisites) {
+            if (!knownSpells.contains(prereq)) {
+                return "Requires spell: " + prereq.getPath();
+            }
+        }
+
+        return "Ready to unlock for " + getUnlockCost() + " levels";
+    }
+
+    /**
+     * Get the custom sound identifier for this spell. Returns the sound field or generates a
+     * default based on school and cast type.
+     */
+    public String getSoundIdentifier() {
+        if (sound != null && !sound.isEmpty()) {
+            return sound;
+        }
+
+        // Generate default sound based on school and cast type
+        String schoolSound = school.name().toLowerCase();
+        String typeSound = switch (castType) {
+            case PROJECTILE -> "projectile";
+            case AOE -> "explosion";
+            case BEAM -> "beam";
+            case SELF_CAST -> "buff";
+            case UTILITY -> "utility";
+            case RITUAL -> "ritual";
+            case SYNERGY -> "synergy";
+            case TRAP -> "trap";
+            case SUMMON -> "summon";
+            case TRANSFORM -> "transform";
+        };
+
+        return "mam:spell." + schoolSound + "." + typeSound;
+    }
+
+    /**
+     * Get the volume modifier for this spell's sound based on tier and rarity.
+     */
+    public float getSoundVolume() {
+        float baseVolume = 1.0f;
+
+        // Tier affects volume (higher tier = louder)
+        baseVolume *= (1.0f + (tier - 1) * 0.1f); // Tier 1 = 1.0x, Tier 4 = 1.3x
+
+        // Rarity affects volume
+        baseVolume *= switch (rarity) {
+            case COMMON -> 0.9f;
+            case UNCOMMON -> 1.0f;
+            case RARE -> 1.1f;
+            case EPIC -> 1.2f;
+            case LEGENDARY -> 1.4f;
+        };
+
+        return Math.min(2.0f, baseVolume);
+    }
+
+    /**
+     * Get the pitch modifier for this spell's sound.
+     */
+    public float getSoundPitch() {
+        // School affects pitch
+        float pitch = switch (school) {
+            case AIR -> 1.2f; // Higher pitch
+            case FIRE -> 1.0f; // Normal
+            case WATER -> 0.9f; // Lower pitch
+            case EARTH -> 0.8f; // Lowest pitch
+        };
+
+        // Cast type fine-tuning
+        if (castType == SpellCastType.BEAM || castType == SpellCastType.PROJECTILE) {
+            pitch += 0.1f;
+        } else if (castType == SpellCastType.RITUAL || castType == SpellCastType.TRANSFORM) {
+            pitch -= 0.1f;
+        }
+
+        return Math.max(0.5f, Math.min(2.0f, pitch));
+    }
+
+
     // TODO: Add spell combination/fusion recipes
     // TODO: Add spell modification system (transmutation)
     // TODO: Add spell presets/loadouts
     // TODO: Add spell tutorial/guidance system
-    // TODO: Add spell rarity/quality tiers
-    // TODO: Add spell unlock requirements/progression
-    // TODO: Add conditional spell effects based on environment
     // TODO: Add spell animation configuration
-    // TODO: Add spell sound effect customization
+
 
     // Status effect entry for serialization
     public record StatusEffectEntry(String effect, int duration, int amplifier) {
@@ -381,5 +535,147 @@ public class Spell {
                 return 0xFFFFFF; // Default to white
             }
         }
+    }
+
+    /**
+     * Spell upgrade system - represents spell progression/scaling. Spells can be upgraded with XP
+     * or resources to improve effectiveness.
+     */
+    public static class SpellUpgrade {
+        private final int upgradeLevel; // 0 = base, 1-5 = upgrade levels
+        private final int totalXpInvested; // Total XP spent on upgrades
+
+        public SpellUpgrade(int upgradeLevel, int totalXpInvested) {
+            this.upgradeLevel = Math.max(0, Math.min(5, upgradeLevel)); // Cap at level 5
+            this.totalXpInvested = Math.max(0, totalXpInvested);
+        }
+
+        /**
+         * Get damage scaling multiplier from upgrade level. Level 0: 1.0x, Level 1: 1.1x, Level 5:
+         * 1.5x
+         */
+        public float getDamageMultiplier() {
+            return 1.0f + (upgradeLevel * 0.1f);
+        }
+
+        /**
+         * Get mana cost reduction from upgrade level. Level 0: 1.0x, Level 5: 0.85x (15% reduction)
+         */
+        public float getManaCostMultiplier() {
+            return 1.0f - (upgradeLevel * 0.03f);
+        }
+
+        /**
+         * Get cooldown reduction from upgrade level. Level 0: 1.0x, Level 5: 0.75x (25% reduction)
+         */
+        public float getCooldownMultiplier() {
+            return 1.0f - (upgradeLevel * 0.05f);
+        }
+
+        /**
+         * Get range bonus from upgrade level. Level 0: 1.0x, Level 5: 1.25x (25% increase)
+         */
+        public float getRangeMultiplier() {
+            return 1.0f + (upgradeLevel * 0.05f);
+        }
+
+        /**
+         * Calculate XP required for next upgrade level.
+         */
+        public int getXpForNextLevel(int spellTier, SpellRarity spellRarity) {
+            if (upgradeLevel >= 5)
+                return Integer.MAX_VALUE; // Max level
+
+            // Base XP scales with tier: Tier 1 = 100 XP/level, Tier 4 = 400 XP/level
+            int baseXp = spellTier * 100;
+
+            // Scale with upgrade level (exponential): 1x, 1.5x, 2x, 2.5x, 3x
+            float levelMultiplier = 1.0f + (upgradeLevel * 0.5f);
+
+            // Rarity affects cost
+            float rarityMultiplier = switch (spellRarity) {
+                case COMMON -> 1.0f;
+                case UNCOMMON -> 1.2f;
+                case RARE -> 1.5f;
+                case EPIC -> 2.0f;
+                case LEGENDARY -> 3.0f;
+            };
+
+            return (int) (baseXp * levelMultiplier * rarityMultiplier);
+        }
+
+        /**
+         * Check if spell can be upgraded to next level.
+         */
+        public boolean canUpgrade(int availableXp, int spellTier, SpellRarity spellRarity) {
+            return upgradeLevel < 5 && availableXp >= getXpForNextLevel(spellTier, spellRarity);
+        }
+
+        /**
+         * Create upgraded version of this upgrade.
+         */
+        public SpellUpgrade upgrade(int spellTier, SpellRarity spellRarity) {
+            if (upgradeLevel >= 5)
+                return this;
+            int xpCost = getXpForNextLevel(spellTier, spellRarity);
+            return new SpellUpgrade(upgradeLevel + 1, totalXpInvested + xpCost);
+        }
+
+        public int getUpgradeLevel() {
+            return upgradeLevel;
+        }
+
+        public int getTotalXpInvested() {
+            return totalXpInvested;
+        }
+
+        /**
+         * Create base spell upgrade (level 0, no XP).
+         */
+        public static SpellUpgrade createBase() {
+            return new SpellUpgrade(0, 0);
+        }
+    }
+
+    /**
+     * Get the scaled damage value for this spell at a specific upgrade level.
+     */
+    public float getUpgradedDamage(SpellUpgrade upgrade) {
+        return damage * upgrade.getDamageMultiplier();
+    }
+
+    /**
+     * Get the scaled mana cost for this spell at a specific upgrade level.
+     */
+    public float getUpgradedManaCost(SpellUpgrade upgrade) {
+        return manaCost * upgrade.getManaCostMultiplier();
+    }
+
+    /**
+     * Get the scaled cooldown for this spell at a specific upgrade level.
+     */
+    public float getUpgradedCooldown(SpellUpgrade upgrade) {
+        return cooldown * upgrade.getCooldownMultiplier();
+    }
+
+    /**
+     * Get the scaled range for this spell at a specific upgrade level.
+     */
+    public float getUpgradedRange(SpellUpgrade upgrade) {
+        return range * upgrade.getRangeMultiplier();
+    }
+
+    /**
+     * Get upgrade progress description for UI display.
+     */
+    public String getUpgradeDescription(SpellUpgrade upgrade) {
+        if (upgrade.getUpgradeLevel() == 0) {
+            return "Not upgraded (XP: " + upgrade.getXpForNextLevel(tier, rarity) + " for Level 1)";
+        }
+        if (upgrade.getUpgradeLevel() >= 5) {
+            return "Max Level (" + upgrade.getTotalXpInvested() + " XP invested)";
+        }
+        return "Level " + upgrade.getUpgradeLevel() + " (Next: "
+                + upgrade.getXpForNextLevel(tier, rarity) + " XP)";
     }
 }

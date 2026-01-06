@@ -3,13 +3,9 @@ package dk.mosberg.mana;
 /**
  * Represents a single mana pool with capacity, current amount, and regeneration rate.
  *
- * TODO: Add temporary capacity modifiers (e.g., buffs increase max capacity) TODO: Implement
- * conditional regeneration (only regen in specific biomes/dimensions) TODO: Add drain effects
- * (spells/mobs drain mana over time) TODO: Implement overfill mechanics (temporary capacity
- * overflow with penalty) TODO: Add efficiency tracking (waste vs. actual usage ratios) TODO:
- * Implement resonance effects (repeated use from same pool increases efficiency) TODO: Add critical
- * points (specific thresholds that unlock abilities) TODO: Implement pool corruption effects (stale
- * mana becomes less useful)
+ * Features implemented: temporary capacity modifiers, conditional regeneration (biome/dimension),
+ * drain effects, overfill mechanics (150% max), efficiency tracking, resonance effects, critical
+ * threshold checking, and corruption mechanics for stale mana.
  */
 public class ManaPool {
     private final int baseMaxCapacity;
@@ -57,11 +53,24 @@ public class ManaPool {
      * Regenerates mana based on the regen rate. Called each tick.
      */
     public void regenerate() {
+        regenerate(1.0f);
+    }
+
+    /**
+     * Regenerates mana with environmental modifiers. Called each tick.
+     *
+     * @param environmentalModifier Modifier based on biome/dimension (0.0 = no regen, 1.0 = normal,
+     *        1.5 = boosted)
+     */
+    public void regenerate(float environmentalModifier) {
         ticksSinceLastUse++;
 
         int effectiveMaxCapacity = getMaxCapacity();
         if (currentMana < effectiveMaxCapacity) {
             float netRegen = baseRegenRate - drainRate;
+
+            // Apply environmental modifier (biome/dimension effects)
+            netRegen *= environmentalModifier;
 
             // Apply corruption penalty if mana has been stale for too long
             float corruptionPenalty = getCorruptionModifier();
@@ -77,6 +86,69 @@ public class ManaPool {
         if (efficiencyModifier > 1.0f) {
             efficiencyModifier = Math.max(1.0f, efficiencyModifier - 0.002f);
         }
+    }
+
+    /**
+     * Calculate environmental regeneration modifier based on location.
+     *
+     * @param poolType Type of mana pool
+     * @param isInNether Whether player is in the Nether
+     * @param isInEnd Whether player is in the End
+     * @param isUnderwater Whether player is underwater
+     * @param biomeName Name of current biome (lowercase)
+     * @return Regeneration multiplier (0.0 - 1.5)
+     */
+    public static float getEnvironmentalRegenModifier(ManaPoolType poolType, boolean isInNether,
+            boolean isInEnd, boolean isUnderwater, String biomeName) {
+        // Base modifier
+        float modifier = 1.0f;
+
+        // Dimension effects
+        if (isInNether) {
+            // Reserve pool boosted in Nether (high power environment)
+            if (poolType == ManaPoolType.RESERVE)
+                modifier *= 1.3f;
+            // Aura pool weakened in Nether (chaotic magic)
+            else if (poolType == ManaPoolType.AURA)
+                modifier *= 0.7f;
+        } else if (isInEnd) {
+            // Aura pool boosted in End (otherworldly magic)
+            if (poolType == ManaPoolType.AURA)
+                modifier *= 1.4f;
+            // Personal pool weakened in End (alien environment)
+            else if (poolType == ManaPoolType.PERSONAL)
+                modifier *= 0.8f;
+        }
+
+        // Underwater effects
+        if (isUnderwater) {
+            // Personal pool struggles underwater
+            if (poolType == ManaPoolType.PERSONAL)
+                modifier *= 0.6f;
+        }
+
+        // Biome effects
+        if (biomeName.contains("desert") || biomeName.contains("badlands")) {
+            // Harsh environments boost Reserve pool
+            if (poolType == ManaPoolType.RESERVE)
+                modifier *= 1.2f;
+        } else if (biomeName.contains("forest") || biomeName.contains("plains")) {
+            // Peaceful biomes boost Aura pool
+            if (poolType == ManaPoolType.AURA)
+                modifier *= 1.2f;
+        } else if (biomeName.contains("mountain") || biomeName.contains("peak")) {
+            // High altitude boosts Personal pool (focus)
+            if (poolType == ManaPoolType.PERSONAL)
+                modifier *= 1.15f;
+        } else if (biomeName.contains("swamp") || biomeName.contains("jungle")) {
+            // Dense magic areas boost all pools slightly
+            modifier *= 1.1f;
+        } else if (biomeName.contains("ice") || biomeName.contains("frozen")) {
+            // Cold slows all regeneration
+            modifier *= 0.85f;
+        }
+
+        return Math.max(0.0f, modifier);
     }
 
     /**

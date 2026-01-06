@@ -26,18 +26,54 @@ import net.minecraft.util.Identifier;
 /**
  * Registry for spells loaded from data packs.
  *
- * TODO: Implement spell validation on load (check required fields) TODO: Add spell compatibility
- * checking (version, dependencies) TODO: Implement hot-reload for spells during development TODO:
- * Add spell inheritance/templates system TODO: Implement spell balancing presets (easy, normal,
- * hard) TODO: Add spell tag system for categorization and filtering TODO: Implement spell
- * compression for network transfer TODO: Add spell dependency resolution (spells requiring other
- * spells) TODO: Implement spell variant/modification system TODO: Add spell versioning and
- * migration system
+ * TODO: Add spell compatibility checking (version, dependencies) TODO: Add spell
+ * inheritance/templates system TODO: Implement spell compression for network transfer TODO:
+ * Implement spell variant/modification system TODO: Add spell versioning and migration system
  */
 public class SpellRegistry {
     private static final Map<Identifier, Spell> SPELLS = new HashMap<>();
     private static int cachedMaxTier = -1;
     private static List<Spell> cachedMaxTierList;
+    private static DifficultyPreset currentDifficulty = DifficultyPreset.NORMAL;
+
+    /**
+     * Difficulty presets that scale spell effectiveness.
+     */
+    public enum DifficultyPreset {
+        EASY(0.8f, 1.2f, 0.8f, "Easy - Lower costs, higher damage"), NORMAL(1.0f, 1.0f, 1.0f,
+                "Normal - Balanced gameplay"), HARD(1.3f, 0.85f, 1.2f,
+                        "Hard - Higher costs, lower damage"), NIGHTMARE(1.5f, 0.7f, 1.5f,
+                                "Nightmare - Challenging gameplay");
+
+        private final float manaCostMultiplier;
+        private final float damageMultiplier;
+        private final float cooldownMultiplier;
+        private final String description;
+
+        DifficultyPreset(float manaCostMultiplier, float damageMultiplier, float cooldownMultiplier,
+                String description) {
+            this.manaCostMultiplier = manaCostMultiplier;
+            this.damageMultiplier = damageMultiplier;
+            this.cooldownMultiplier = cooldownMultiplier;
+            this.description = description;
+        }
+
+        public float getManaCostMultiplier() {
+            return manaCostMultiplier;
+        }
+
+        public float getDamageMultiplier() {
+            return damageMultiplier;
+        }
+
+        public float getCooldownMultiplier() {
+            return cooldownMultiplier;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
 
     @SuppressWarnings("deprecation")
     public static void register() {
@@ -110,6 +146,72 @@ public class SpellRegistry {
         }
 
         MAM.LOGGER.info("Spell loading complete: {} loaded, {} failed", loaded, failed);
+    }
+
+    /**
+     * Manually trigger a spell reload. Useful for development and testing. Can be called from a
+     * command or debug interface.
+     *
+     * @param manager Resource manager to load spells from
+     * @return Number of spells successfully loaded
+     */
+    public static int hotReload(ResourceManager manager) {
+        int beforeCount = SPELLS.size();
+        MAM.LOGGER.info("Hot-reloading spells... (current: {})", beforeCount);
+
+        loadSpells(manager);
+
+        int afterCount = SPELLS.size();
+        MAM.LOGGER.info("Hot-reload complete: {} spells loaded (was {})", afterCount, beforeCount);
+
+        return afterCount;
+    }
+
+    /**
+     * Check if hot-reload is enabled (always true for development). This can be expanded to check
+     * for dev/production mode.
+     */
+    public static boolean isHotReloadEnabled() {
+        // For now, always enabled. Can be expanded with config option.
+        return true;
+    }
+
+    /**
+     * Set the current difficulty preset.
+     *
+     * @param preset Difficulty preset to apply
+     */
+    public static void setDifficulty(DifficultyPreset preset) {
+        currentDifficulty = preset;
+        MAM.LOGGER.info("Difficulty set to: {} - {}", preset.name(), preset.getDescription());
+    }
+
+    /**
+     * Get the current difficulty preset.
+     */
+    public static DifficultyPreset getDifficulty() {
+        return currentDifficulty;
+    }
+
+    /**
+     * Apply difficulty scaling to a spell's mana cost.
+     */
+    public static float getScaledManaCost(float baseCost) {
+        return baseCost * currentDifficulty.getManaCostMultiplier();
+    }
+
+    /**
+     * Apply difficulty scaling to a spell's damage.
+     */
+    public static float getScaledDamage(float baseDamage) {
+        return baseDamage * currentDifficulty.getDamageMultiplier();
+    }
+
+    /**
+     * Apply difficulty scaling to a spell's cooldown.
+     */
+    public static float getScaledCooldown(float baseCooldown) {
+        return baseCooldown * currentDifficulty.getCooldownMultiplier();
     }
 
     public static Optional<Spell> getSpell(Identifier id) {
