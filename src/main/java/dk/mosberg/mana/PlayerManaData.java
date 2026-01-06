@@ -3,6 +3,7 @@ package dk.mosberg.mana;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Objects;
+import dk.mosberg.config.ServerConfig;
 import net.minecraft.nbt.NbtCompound;
 
 /**
@@ -14,10 +15,21 @@ public class PlayerManaData {
     private ManaPoolType activePriority = ManaPoolType.PERSONAL;
 
     public PlayerManaData() {
-        // Initialize all three pools with default values
-        for (ManaPoolType type : ManaPoolType.values()) {
-            pools.put(type, new ManaPool(type.getDefaultCapacity(), type.getDefaultRegenRate()));
-        }
+        this(loadConfigValues());
+    }
+
+    private PlayerManaData(ServerConfig config) {
+        // Initialize all three pools with configured defaults
+        pools.put(ManaPoolType.PERSONAL,
+                new ManaPool(config.personalManaCapacity, config.personalManaRegen));
+        pools.put(ManaPoolType.AURA, new ManaPool(config.auraManaCapacity, config.auraManaRegen));
+        pools.put(ManaPoolType.RESERVE,
+                new ManaPool(config.reserveManaCapacity, config.reserveManaRegen));
+    }
+
+    private static ServerConfig loadConfigValues() {
+        // ServerConfig is available on both sides; clients will just read defaults if file absent
+        return ServerConfig.getInstance();
     }
 
     /**
@@ -59,6 +71,10 @@ public class PlayerManaData {
 
     public void setActivePriority(ManaPoolType priority) {
         this.activePriority = Objects.requireNonNull(priority, "Priority cannot be null");
+    }
+
+    public void updatePool(ManaPoolType type, int maxCapacity, float current, float regen) {
+        pools.put(type, new ManaPool(maxCapacity, current, regen));
     }
 
     @SuppressWarnings("null")

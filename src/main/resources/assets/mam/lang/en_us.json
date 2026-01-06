@@ -73,6 +73,7 @@
 
   "message.mam.spell.cooldown": "Spell on cooldown: %.1fs remaining",
   "message.mam.spell.insufficient_mana": "Insufficient mana! Need %.1f, have %.1f",
+  "message.mam.spell.too_high_tier": "Spell requires tier %s spellbook",
   "message.mam.spell.learned": "Learned spell: %s",
   "message.mam.no_staff": "You must hold a staff to open spell selection!",
   "message.mam.no_spellbook": "You must hold a spellbook to open spell selection!",

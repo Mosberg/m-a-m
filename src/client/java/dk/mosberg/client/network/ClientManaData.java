@@ -11,9 +11,12 @@ public class ClientManaData {
 
     public static void updateFromServer(float personalMana, float personalMax, float auraMana,
             float auraMax, float reserveMana, float reserveMax, String activePriority) {
-        clientMana.getPool(ManaPoolType.PERSONAL).set(personalMana);
-        clientMana.getPool(ManaPoolType.AURA).set(auraMana);
-        clientMana.getPool(ManaPoolType.RESERVE).set(reserveMana);
+        clientMana.updatePool(ManaPoolType.PERSONAL, Math.round(personalMax), personalMana,
+                clientMana.getPool(ManaPoolType.PERSONAL).getRegenRate());
+        clientMana.updatePool(ManaPoolType.AURA, Math.round(auraMax), auraMana,
+                clientMana.getPool(ManaPoolType.AURA).getRegenRate());
+        clientMana.updatePool(ManaPoolType.RESERVE, Math.round(reserveMax), reserveMana,
+                clientMana.getPool(ManaPoolType.RESERVE).getRegenRate());
 
         try {
             clientMana.setActivePriority(ManaPoolType.valueOf(activePriority));

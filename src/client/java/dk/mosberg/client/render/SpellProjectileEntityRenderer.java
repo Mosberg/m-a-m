@@ -15,8 +15,8 @@ import net.minecraft.util.Identifier;
  * 1.21.11. Advanced particle effects and custom rendering will be added later.
  */
 @Environment(EnvType.CLIENT)
-public class SpellProjectileEntityRenderer
-        extends EntityRenderer<SpellProjectileEntity, EntityRenderState> {
+public class SpellProjectileEntityRenderer extends
+        EntityRenderer<SpellProjectileEntity, SpellProjectileEntityRenderer.SpellProjectileRenderState> {
 
     private static final Identifier FIRE_TEXTURE =
             Identifier.of(MAM.MOD_ID, "textures/entity/projectile/fire.png");
@@ -31,22 +31,28 @@ public class SpellProjectileEntityRenderer
         super(context);
     }
 
-    public EntityRenderState createRenderState() {
-        return new EntityRenderState();
+    @Override
+    public SpellProjectileRenderState createRenderState() {
+        return new SpellProjectileRenderState();
     }
 
-    public Identifier getTexture(EntityRenderState state) {
-        // Default to fire texture
-        // In a full implementation, we'd store school info in the render state
-        return FIRE_TEXTURE;
+    @Override
+    public void updateRenderState(SpellProjectileEntity entity, SpellProjectileRenderState state,
+            float tickDelta) {
+        super.updateRenderState(entity, state, tickDelta);
+        state.school = entity.getSchool();
     }
 
-    public Identifier getTextureForSchool(SpellSchool school) {
-        return switch (school) {
+    public Identifier getTexture(SpellProjectileRenderState state) {
+        return switch (state.school) {
             case FIRE -> FIRE_TEXTURE;
             case WATER -> WATER_TEXTURE;
             case AIR -> AIR_TEXTURE;
             case EARTH -> EARTH_TEXTURE;
         };
+    }
+
+    public static class SpellProjectileRenderState extends EntityRenderState {
+        public SpellSchool school = SpellSchool.FIRE;
     }
 }

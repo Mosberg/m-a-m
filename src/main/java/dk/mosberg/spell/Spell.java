@@ -5,6 +5,7 @@ import java.util.Optional;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 
@@ -204,9 +205,12 @@ public class Spell {
                         .apply(instance, StatusEffectEntry::new));
 
         public Optional<RegistryEntry<StatusEffect>> getStatusEffect() {
-            // For now, return empty - status effects are optional
-            // TODO: Implement proper status effect lookup when API allows
-            return Optional.empty();
+            Identifier id = Identifier.tryParse(effect);
+            if (id == null) {
+                return Optional.empty();
+            }
+            return Registries.STATUS_EFFECT.getEntry(id)
+                    .map(entry -> (net.minecraft.registry.entry.RegistryEntry<StatusEffect>) entry);
         }
     }
 

@@ -26,7 +26,7 @@ public class SpellScreenHelper {
      * Opens the spell selection screen with all spells up to a max tier.
      */
     public static void openSpellSelection(int maxTier) {
-        List<Spell> spells = SpellRegistry.getSpellsByTier(maxTier);
+        List<Spell> spells = SpellRegistry.getSpellsByMaxTier(maxTier);
         MinecraftClient.getInstance().setScreen(new SpellSelectionScreen(spells));
     }
 

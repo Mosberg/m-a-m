@@ -24,6 +24,10 @@ public class SpellCaster {
                 player.getAttachedOrCreate(ManaAttachments.PLAYER_MANA, PlayerManaData::new),
                 "Player mana attachment should always exist");
 
+        if (!hasRequiredSpellbook(player, spell)) {
+            return;
+        }
+
         // Check mana cost
         if (!manaData.consumeMana(spell.getManaCost())) {
             player.sendMessage(Text.translatable("mana.mam.insufficient"), true);
@@ -113,5 +117,30 @@ public class SpellCaster {
         // TODO: Implement synergy spells combining multiple schools
         // For now, treat as AoE
         castAoE(player, spell);
+    }
+
+    private static boolean hasRequiredSpellbook(ServerPlayerEntity player, Spell spell) {
+        var main = player.getMainHandStack();
+        var off = player.getOffHandStack();
+
+        int tier = -1;
+        if (main.getItem() instanceof dk.mosberg.item.SpellbookItem mainBook) {
+            tier = mainBook.getTier();
+        } else if (off.getItem() instanceof dk.mosberg.item.SpellbookItem offBook) {
+            tier = offBook.getTier();
+        }
+
+        if (tier < 0) {
+            player.sendMessage(Text.translatable("message.mam.no_spellbook"), true);
+            return false;
+        }
+
+        if (spell.getTier() > tier) {
+            player.sendMessage(
+                    Text.translatable("message.mam.spell.too_high_tier", spell.getTier()), true);
+            return false;
+        }
+
+        return true;
     }
 }

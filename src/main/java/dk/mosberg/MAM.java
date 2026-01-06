@@ -15,6 +15,7 @@ import dk.mosberg.network.OpenSpellBookPayload;
 import dk.mosberg.network.SelectSpellPayload;
 import dk.mosberg.network.ServerNetworkHandler;
 import dk.mosberg.spell.SpellRegistry;
+import dk.mosberg.spell.SpellSchool;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.item.Item;
@@ -36,61 +37,67 @@ public class MAM implements ModInitializer {
 	// ═════════════════════════════════════════════════════════════════════════════
 	// Gemstone Items
 	// ═════════════════════════════════════════════════════════════════════════════
-	public static final Item RUBY = registerItem("ruby", new Item(new Item.Settings()
-			.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "ruby")))));
-	public static final Item SAPPHIRE = registerItem("sapphire", new Item(new Item.Settings()
-			.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "sapphire")))));
+	public static final Item RUBY = registerItem("ruby",
+			new Item(new Item.Settings().component(MAMDataComponents.SPELL_SCHOOL, SpellSchool.FIRE)
+					.registryKey(
+							RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "ruby")))));
+	public static final Item SAPPHIRE = registerItem("sapphire",
+			new Item(new Item.Settings()
+					.component(MAMDataComponents.SPELL_SCHOOL, SpellSchool.WATER).registryKey(
+							RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "sapphire")))));
 	public static final Item MOONSTONE = registerItem("moonstone", new Item(new Item.Settings()
+			.component(MAMDataComponents.SPELL_SCHOOL, SpellSchool.AIR)
 			.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "moonstone")))));
-	public static final Item PERIDOT = registerItem("peridot", new Item(new Item.Settings()
-			.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "peridot")))));
+	public static final Item PERIDOT = registerItem("peridot",
+			new Item(new Item.Settings()
+					.component(MAMDataComponents.SPELL_SCHOOL, SpellSchool.EARTH).registryKey(
+							RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "peridot")))));
 
 	// ═════════════════════════════════════════════════════════════════════════════
 	// Staff Items (4 tiers)
 	// ═════════════════════════════════════════════════════════════════════════════
 	public static final Item STAFF_NOVICE =
 			registerItem("staff_novice",
-					new StaffItem(
-							new Item.Settings().maxCount(1).registryKey(RegistryKey
+					new StaffItem(new Item.Settings().maxCount(1)
+							.component(MAMDataComponents.TIER, 1).registryKey(RegistryKey
 									.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "staff_novice"))),
 							1));
-	public static final Item STAFF_APPRENTICE = registerItem("staff_apprentice",
-			new StaffItem(new Item.Settings().maxCount(1).registryKey(
+	public static final Item STAFF_APPRENTICE = registerItem("staff_apprentice", new StaffItem(
+			new Item.Settings().maxCount(1).component(MAMDataComponents.TIER, 2).registryKey(
 					RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "staff_apprentice"))),
-					2));
+			2));
 	public static final Item STAFF_ADEPT =
 			registerItem("staff_adept",
-					new StaffItem(
-							new Item.Settings().maxCount(1).registryKey(RegistryKey
+					new StaffItem(new Item.Settings().maxCount(1)
+							.component(MAMDataComponents.TIER, 3).registryKey(RegistryKey
 									.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "staff_adept"))),
 							3));
 	public static final Item STAFF_MASTER =
 			registerItem("staff_master",
-					new StaffItem(
-							new Item.Settings().maxCount(1).registryKey(RegistryKey
+					new StaffItem(new Item.Settings().maxCount(1)
+							.component(MAMDataComponents.TIER, 4).registryKey(RegistryKey
 									.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "staff_master"))),
 							4));
-
 	// ═════════════════════════════════════════════════════════════════════════════
 	// Spellbook Items (4 tiers)
 	// ═════════════════════════════════════════════════════════════════════════════
-	public static final Item SPELLBOOK_NOVICE = registerItem("spellbook_novice",
-			new SpellbookItem(new Item.Settings().maxCount(1).registryKey(
+	public static final Item SPELLBOOK_NOVICE = registerItem("spellbook_novice", new SpellbookItem(
+			new Item.Settings().maxCount(1).component(MAMDataComponents.TIER, 1).registryKey(
 					RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "spellbook_novice"))),
-					1));
+			1));
 	public static final Item SPELLBOOK_APPRENTICE =
-			registerItem("spellbook_apprentice",
-					new SpellbookItem(new Item.Settings().maxCount(1).registryKey(RegistryKey
+			registerItem("spellbook_apprentice", new SpellbookItem(new Item.Settings().maxCount(1)
+					.component(MAMDataComponents.TIER, 2).registryKey(RegistryKey
 							.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "spellbook_apprentice"))),
-							2));
-	public static final Item SPELLBOOK_ADEPT = registerItem("spellbook_adept",
-			new SpellbookItem(new Item.Settings().maxCount(1).registryKey(
+					2));
+	public static final Item SPELLBOOK_ADEPT = registerItem("spellbook_adept", new SpellbookItem(
+			new Item.Settings().maxCount(1).component(MAMDataComponents.TIER, 3).registryKey(
 					RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "spellbook_adept"))),
-					3));
-	public static final Item SPELLBOOK_MASTER = registerItem("spellbook_master",
-			new SpellbookItem(new Item.Settings().maxCount(1).registryKey(
+			3));
+	public static final Item SPELLBOOK_MASTER = registerItem("spellbook_master", new SpellbookItem(
+			new Item.Settings().maxCount(1).component(MAMDataComponents.TIER, 4).registryKey(
 					RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "spellbook_master"))),
-					4));
+			4));
 
 	@SuppressWarnings("null")
 	@Override

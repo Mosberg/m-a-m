@@ -7,11 +7,15 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -22,6 +26,9 @@ import net.minecraft.world.World;
  * Custom projectile entity for spell casting.
  */
 public class SpellProjectileEntity extends ProjectileEntity {
+    private static final TrackedData<Byte> SCHOOL_TRACKER =
+            DataTracker.registerData(SpellProjectileEntity.class, TrackedDataHandlerRegistry.BYTE);
+
     private SpellSchool school = SpellSchool.FIRE;
     private float damage = 2.0f;
     private float knockback = 0.0f;
@@ -36,7 +43,7 @@ public class SpellProjectileEntity extends ProjectileEntity {
     public SpellProjectileEntity(World world, LivingEntity owner, Spell spell) {
         super(MAMEntities.SPELL_PROJECTILE, world);
         this.setOwner(owner);
-        this.school = spell.getSchool();
+        setSchool(spell.getSchool());
         this.damage = spell.getDamage();
         this.knockback = spell.getKnockback();
         float speed = Math.max(0.05f, spell.getProjectileSpeed());
@@ -54,8 +61,22 @@ public class SpellProjectileEntity extends ProjectileEntity {
     }
 
     @Override
-    protected void initDataTracker(net.minecraft.entity.data.DataTracker.Builder builder) {
-        // No additional data tracking needed for now
+    protected void initDataTracker(DataTracker.Builder builder) {
+        builder.add(SCHOOL_TRACKER, (byte) school.ordinal());
+    }
+
+    private void setSchool(SpellSchool school) {
+        this.school = school;
+        this.getDataTracker().set(SCHOOL_TRACKER, (byte) school.ordinal());
+    }
+
+    public SpellSchool getSchool() {
+        byte idx = this.getDataTracker().get(SCHOOL_TRACKER);
+        SpellSchool[] values = SpellSchool.values();
+        if (idx >= 0 && idx < values.length) {
+            return values[idx];
+        }
+        return school;
     }
 
     @Override
@@ -132,32 +153,27 @@ public class SpellProjectileEntity extends ProjectileEntity {
 
     private void spawnParticles() {
         // Particle spawning will be handled by renderer
-        // This is a placeholder for future particle effects
     }
 
-    public SpellSchool getSchool() {
-        return school;
+    @Override
+    protected void writeCustomData(WriteView view) {
+        view.putString("School", school.name());
+        view.putFloat("Damage", damage);
+        view.putFloat("Knockback", knockback);
+        view.putInt("Age", age);
     }
 
-    protected void writeCustomDataToNbt(NbtCompound nbt) {
-        nbt.putString("School", school.name());
-        nbt.putFloat("Damage", damage);
-        nbt.putFloat("Knockback", knockback);
-        nbt.putInt("Age", age);
-    }
+    @Override
+    protected void readCustomData(ReadView view) {
+        String schoolName = view.getString("School", SpellSchool.FIRE.name());
+        try {
+            setSchool(SpellSchool.valueOf(schoolName));
+        } catch (IllegalArgumentException ignored) {
+            setSchool(SpellSchool.FIRE);
+        }
 
-    protected void readCustomDataFromNbt(NbtCompound nbt) {
-        if (nbt.contains("School")) {
-            this.school = SpellSchool.valueOf(nbt.getString("School").orElse("FIRE"));
-        }
-        if (nbt.contains("Damage")) {
-            this.damage = nbt.getFloat("Damage").orElse(2.0f);
-        }
-        if (nbt.contains("Knockback")) {
-            this.knockback = nbt.getFloat("Knockback").orElse(0.0f);
-        }
-        if (nbt.contains("Age")) {
-            this.age = nbt.getInt("Age").orElse(0);
-        }
+        this.damage = view.getFloat("Damage", this.damage);
+        this.knockback = view.getFloat("Knockback", this.knockback);
+        this.age = view.getInt("Age", this.age);
     }
 }
