@@ -3,9 +3,8 @@ package dk.mosberg.mana;
 /**
  * Four mana pool types in the advanced mana system.
  *
- * Features implemented: Pool affinity system, pool conversion mechanics, regional variations.
- *
- * TODO: Implement pool linking (shared pools for teams/guilds)
+ * Features implemented: Pool affinity system, pool conversion mechanics, regional variations, pool
+ * linking.
  */
 public enum ManaPoolType {
     PERSONAL(250, 0.5f, "Personal", 0xFF4A90E2, 1.0f, 1.0f, 1.0f), // Blue - balanced

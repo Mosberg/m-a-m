@@ -25,17 +25,17 @@ public class Spell {
 
     // Bundle trailing fields to stay within the 16-field RecordCodecBuilder limit
     private record Tail(String sound, Optional<VfxData> vfx, List<String> tags,
-            Optional<String> rarity, Optional<Identifier> parent,
-            Optional<AnimationData> animation) {
+            Optional<String> rarity, Optional<Identifier> parent, Optional<AnimationData> animation,
+            int formatVersion) {
         @SuppressWarnings("null")
-        static final MapCodec<Tail> CODEC = RecordCodecBuilder.mapCodec(instance -> instance
-                .group(Codec.STRING.optionalFieldOf("sound", "").forGetter(Tail::sound),
-                        VfxData.CODEC.optionalFieldOf("vfx").forGetter(Tail::vfx),
-                        Codec.STRING.listOf().optionalFieldOf("tags", List.of())
-                                .forGetter(Tail::tags),
-                        Codec.STRING.optionalFieldOf("rarity").forGetter(Tail::rarity),
-                        Identifier.CODEC.optionalFieldOf("parent").forGetter(Tail::parent),
-                        AnimationData.CODEC.optionalFieldOf("animation").forGetter(Tail::animation))
+        static final MapCodec<Tail> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                Codec.STRING.optionalFieldOf("sound", "").forGetter(Tail::sound),
+                VfxData.CODEC.optionalFieldOf("vfx").forGetter(Tail::vfx),
+                Codec.STRING.listOf().optionalFieldOf("tags", List.of()).forGetter(Tail::tags),
+                Codec.STRING.optionalFieldOf("rarity").forGetter(Tail::rarity),
+                Identifier.CODEC.optionalFieldOf("parent").forGetter(Tail::parent),
+                AnimationData.CODEC.optionalFieldOf("animation").forGetter(Tail::animation),
+                Codec.INT.optionalFieldOf("format_version", 1).forGetter(Tail::formatVersion))
                 .apply(instance, Tail::new));
     }
 
@@ -46,7 +46,8 @@ public class Spell {
                             .forGetter((Spell spell) -> spell.getSchool().name()),
                     Codec.STRING.optionalFieldOf("description", "")
                             .forGetter(Spell::getDescription),
-                    Codec.STRING.fieldOf("castType")
+                    Codec.STRING
+                            .fieldOf("castType")
                             .forGetter((Spell spell) -> spell.getCastType().name()),
                     Codec.FLOAT.fieldOf("manaCost").forGetter(Spell::getManaCost),
                     Codec.FLOAT.optionalFieldOf("castTime", 1.0f).forGetter(Spell::getCastTime),
@@ -56,13 +57,15 @@ public class Spell {
                             .forGetter(Spell::getRequiredLevel),
                     Codec.FLOAT.optionalFieldOf("damage", 0.0f).forGetter(Spell::getDamage),
                     Codec.FLOAT.optionalFieldOf("range", 30.0f).forGetter(Spell::getRange),
-                    Codec.FLOAT.optionalFieldOf("projectileSpeed", 1.0f)
+                    Codec.FLOAT
+                            .optionalFieldOf("projectileSpeed", 1.0f)
                             .forGetter(Spell::getProjectileSpeed),
                     Codec.FLOAT.optionalFieldOf("aoeRadius", 0.0f).forGetter(Spell::getAoeRadius),
                     Codec.FLOAT.optionalFieldOf("knockback", 0.0f).forGetter(Spell::getKnockback),
                     Tail.CODEC.forGetter(spell -> new Tail(spell.getSound(), spell.getVfxOptional(),
                             spell.getTags(), Optional.ofNullable(spell.getRarity()).map(Enum::name),
-                            spell.getParent(), spell.getAnimationOptional())))
+                            spell.getParent(), spell.getAnimationOptional(),
+                            spell.getFormatVersion())))
             .apply(instance,
                     (id, name, school, desc, castType, manaCost, castTime, cooldown, tier,
                             requiredLevel, damage, range, projectileSpeed, aoeRadius, knockback,
@@ -70,7 +73,7 @@ public class Spell {
                                     cooldown, tier, requiredLevel, damage, range, projectileSpeed,
                                     aoeRadius, knockback, List.of(), java.util.Map.of(),
                                     tail.sound(), tail.vfx(), tail.tags(), tail.rarity(),
-                                    tail.parent(), tail.animation())));
+                                    tail.parent(), tail.animation(), tail.formatVersion())));
 
     private final Identifier id;
     private final String name;
@@ -95,6 +98,7 @@ public class Spell {
     private final Optional<Identifier> parent;
     private final AnimationData animation;
     private final List<String> tags;
+    private final int formatVersion;
 
     public Spell(Identifier id, String name, String school, String description, String castType,
             float manaCost, float castTime, float cooldown, int tier, int requiredLevel,
@@ -104,7 +108,7 @@ public class Spell {
         this(id, name, school, description, castType, manaCost, castTime, cooldown, tier,
                 requiredLevel, damage, range, projectileSpeed, aoeRadius, knockback, statusEffects,
                 customData, sound, vfx, List.of(), Optional.empty(), Optional.empty(),
-                Optional.empty());
+                Optional.empty(), 1);
     }
 
     public Spell(Identifier id, String name, String school, String description, String castType,
@@ -114,7 +118,8 @@ public class Spell {
             String sound, Optional<VfxData> vfx, List<String> tags) {
         this(id, name, school, description, castType, manaCost, castTime, cooldown, tier,
                 requiredLevel, damage, range, projectileSpeed, aoeRadius, knockback, statusEffects,
-                customData, sound, vfx, tags, Optional.empty(), Optional.empty(), Optional.empty());
+                customData, sound, vfx, tags, Optional.empty(), Optional.empty(), Optional.empty(),
+                1);
     }
 
     public Spell(Identifier id, String name, String school, String description, String castType,
@@ -122,7 +127,7 @@ public class Spell {
             float damage, float range, float projectileSpeed, float aoeRadius, float knockback,
             List<StatusEffectEntry> statusEffects, java.util.Map<String, Float> customData,
             String sound, Optional<VfxData> vfx, List<String> tags, Optional<String> rarity,
-            Optional<Identifier> parent, Optional<AnimationData> animation) {
+            Optional<Identifier> parent, Optional<AnimationData> animation, int formatVersion) {
         this.id = id;
         this.name = name;
         this.school = SpellSchool.valueOf(school.toUpperCase());
@@ -147,6 +152,7 @@ public class Spell {
         this.tags = new java.util.ArrayList<>(tags);
         this.parent = parent;
         this.animation = animation.orElse(null);
+        this.formatVersion = formatVersion;
     }
 
     /**
@@ -156,10 +162,13 @@ public class Spell {
             String castType, float manaCost, float castTime, float cooldown, int tier,
             int requiredLevel, float damage, float range, float projectileSpeed, float aoeRadius,
             float knockback, List<StatusEffectEntry> statusEffects,
-            java.util.Map<String, Float> customData, String sound, Optional<VfxData> vfx) {
+            java.util.Map<String, Float> customData, String sound, Optional<VfxData> vfx,
+            List<String> tags, Optional<String> rarity, Optional<Identifier> parent,
+            Optional<AnimationData> animation, int formatVersion) {
         return new Spell(id, name, school, description, castType, manaCost, castTime, cooldown,
                 tier, requiredLevel, damage, range, projectileSpeed, aoeRadius, knockback,
-                statusEffects, customData, sound, vfx);
+                statusEffects, customData, sound, vfx, tags, rarity, parent, animation,
+                formatVersion);
     }
 
     // Getters
@@ -368,6 +377,10 @@ public class Spell {
 
     public Optional<AnimationData> getAnimationOptional() {
         return Optional.ofNullable(animation);
+    }
+
+    public int getFormatVersion() {
+        return formatVersion;
     }
 
     /**

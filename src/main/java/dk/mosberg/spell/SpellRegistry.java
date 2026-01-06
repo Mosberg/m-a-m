@@ -152,6 +152,9 @@ public class SpellRegistry {
         // Resolve simple inheritance/templates after initial load
         resolveInheritance();
 
+        // Apply spell variants (modifiers) post-inheritance
+        applyVariants();
+
         MAM.LOGGER.info("Spell loading complete: {} loaded, {} failed", loaded, failed);
     }
 
@@ -358,19 +361,44 @@ public class SpellRegistry {
     }
 
     /**
-     * Basic compatibility check placeholder. Currently validates tier range and reserved for schema
-     * format checks. Extend to enforce schema versions when spells start specifying it.
+     * Compatibility check: validates that the spell's format version matches the supported version.
+     * Unsupported versions are logged as warnings and skipped during loading.
      */
     private static boolean isCompatible(Spell spell) {
-        // Placeholder for future: when Spell exposes optional format, reject unsupported.
-        // Example:
-        // if (spell.getFormat().isPresent() && spell.getFormat().getAsInt() !=
-        // SUPPORTED_SPELL_FORMAT) {
-        // MAM.LOGGER.warn("Skipping spell {} due to incompatible format {} (supported {})",
-        // spell.getId(), spell.getFormat().getAsInt(), SUPPORTED_SPELL_FORMAT);
-        // return false;
-        // }
+        int spellFormat = spell.getFormatVersion();
+        if (spellFormat != SUPPORTED_SPELL_FORMAT) {
+            MAM.LOGGER.warn("Skipping spell {} due to incompatible format {} (supported {})",
+                    spell.getId(), spellFormat, SUPPORTED_SPELL_FORMAT);
+            return false;
+        }
         return true;
+    }
+
+    /**
+     * Apply spell variants to loaded spells. Variants modify spells with damage multipliers, mana
+     * cost adjustments, tag additions, etc.
+     *
+     * Must be called after inheritance resolution.
+     */
+    private static void applyVariants() {
+        if (SPELLS.isEmpty())
+            return;
+
+        var modifiedSpells = new java.util.HashMap<Identifier, Spell>();
+
+        for (var entry : SPELLS.entrySet()) {
+            Spell spell = entry.getValue();
+            if (SpellVariantRegistry.hasVariants(spell.getId())) {
+                Spell variantSpell = SpellVariantRegistry.applyVariants(spell);
+                modifiedSpells.put(entry.getKey(), variantSpell);
+            }
+        }
+
+        // Update registry with variant-modified spells
+        SPELLS.putAll(modifiedSpells);
+        if (!modifiedSpells.isEmpty()) {
+            MAM.LOGGER.info("Applied variants to {} spell(s)", modifiedSpells.size());
+        }
     }
 
     /**
@@ -429,7 +457,8 @@ public class SpellRegistry {
                         child.getRequiredLevel(), child.getDamage(), child.getRange(),
                         child.getProjectileSpeed(), child.getAoeRadius(), child.getKnockback(),
                         effects, custom, sound, vfx, new java.util.ArrayList<>(tags),
-                        java.util.Optional.of(child.getRarity().name()), child.getParent(), anim);
+                        java.util.Optional.of(child.getRarity().name()), child.getParent(), anim,
+                        child.getFormatVersion());
 
                 if (merged != child) {
                     SPELLS.put(child.getId(), merged);

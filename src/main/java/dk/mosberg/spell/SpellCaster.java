@@ -58,6 +58,11 @@ public class SpellCaster {
             case UTILITY -> castUtility(player, spell);
             case RITUAL -> castRitual(player, spell);
             case SYNERGY -> castSynergy(player, spell);
+            case SELF_CAST -> castUtility(player, spell);
+            case SUMMON -> castUtility(player, spell);
+            case TRANSFORM -> castUtility(player, spell);
+            case TRAP -> castAoE(player, spell);
+            case BEAM -> castProjectile(player, spell);
         }
 
         // Play sound effect
