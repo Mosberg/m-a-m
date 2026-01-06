@@ -245,6 +245,7 @@ public class SpellSelectionScreen extends Screen {
         this.init();
     }
 
+    @SuppressWarnings("null")
     private void loadFavorites() {
         if (!Files.exists(FAVORITES_FILE)) {
             return;

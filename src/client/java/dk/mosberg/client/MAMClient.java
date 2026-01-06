@@ -5,6 +5,7 @@ import dk.mosberg.client.input.MagicKeyBindings;
 import dk.mosberg.client.network.ClientNetworkHandler;
 import dk.mosberg.client.network.StaffCastingHandler;
 import dk.mosberg.client.render.SpellProjectileEntityRenderer;
+import dk.mosberg.client.tooltip.ItemTooltips;
 import dk.mosberg.config.ClientConfig;
 import dk.mosberg.entity.MAMEntities;
 import net.fabricmc.api.ClientModInitializer;
@@ -35,5 +36,8 @@ public class MAMClient implements ClientModInitializer {
 
 		// Register spellbook casting handler
 		StaffCastingHandler.register();
+
+		// Register rich item tooltips
+		ItemTooltips.register();
 	}
 }

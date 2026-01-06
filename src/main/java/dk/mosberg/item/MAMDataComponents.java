@@ -15,15 +15,13 @@ import net.minecraft.util.Identifier;
 public class MAMDataComponents {
 
     // Component for spell school binding on gemstones
-    @SuppressWarnings("null")
     public static final ComponentType<SpellSchool> SPELL_SCHOOL = Registry.register(
             Registries.DATA_COMPONENT_TYPE, Identifier.of(MAM.MOD_ID, "spell_school"),
             ComponentType.<SpellSchool>builder()
-                    .codec(Codec.STRING.xmap(str -> SpellSchool.valueOf(str.toUpperCase()),
-                            school -> school.name().toLowerCase()))
-                    .packetCodec(
-                            PacketCodecs.STRING.xmap(str -> SpellSchool.valueOf(str.toUpperCase()),
-                                    school -> school.name().toLowerCase()))
+                    .codec(Codec.STRING.xmap(MAMDataComponents::decodeSpellSchool,
+                            MAMDataComponents::encodeSpellSchool))
+                    .packetCodec(PacketCodecs.STRING.xmap(MAMDataComponents::decodeSpellSchool,
+                            MAMDataComponents::encodeSpellSchool))
                     .build());
 
     // Component for tier level on staffs and spellbooks
@@ -39,5 +37,18 @@ public class MAMDataComponents {
 
     public static void register() {
         MAM.LOGGER.info("Registered data components");
+    }
+
+    private static SpellSchool decodeSpellSchool(String value) {
+        try {
+            return SpellSchool.valueOf(value.toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            MAM.LOGGER.warn("Invalid spell school '{}', defaulting to AIR", value);
+            return SpellSchool.AIR;
+        }
+    }
+
+    private static String encodeSpellSchool(SpellSchool school) {
+        return school.name().toLowerCase();
     }
 }

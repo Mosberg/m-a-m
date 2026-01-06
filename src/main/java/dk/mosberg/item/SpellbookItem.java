@@ -14,14 +14,29 @@ import net.minecraft.world.World;
  */
 public class SpellbookItem extends Item {
     private final int tier;
+    private static final int MIN_TIER = 1;
+    private static final int MAX_TIER = 4;
 
     public SpellbookItem(Settings settings, int tier) {
         super(settings);
-        this.tier = tier;
+        this.tier = clampTier(tier);
     }
 
     public int getTier() {
         return tier;
+    }
+
+    private static int clampTier(int value) {
+        return Math.max(MIN_TIER, Math.min(MAX_TIER, value));
+    }
+
+    private int resolveTier(ItemStack stack) {
+        Integer stored = stack.get(MAMDataComponents.TIER);
+        int resolved = stored != null ? clampTier(stored) : tier;
+        if (stored == null || stored != resolved) {
+            stack.set(MAMDataComponents.TIER, resolved);
+        }
+        return resolved;
     }
 
     /**
@@ -32,6 +47,14 @@ public class SpellbookItem extends Item {
      */
     public static void setSelectedSpell(ItemStack spellbook, Identifier spellId) {
         spellbook.set(MAMDataComponents.SELECTED_SPELL, spellId.toString());
+    }
+
+    public static boolean hasSelectedSpell(ItemStack spellbook) {
+        return spellbook.get(MAMDataComponents.SELECTED_SPELL) != null;
+    }
+
+    public static void clearSelectedSpell(ItemStack spellbook) {
+        spellbook.remove(MAMDataComponents.SELECTED_SPELL);
     }
 
     /**
@@ -46,11 +69,21 @@ public class SpellbookItem extends Item {
     }
 
     @Override
+    public ItemStack getDefaultStack() {
+        ItemStack stack = super.getDefaultStack();
+        stack.set(MAMDataComponents.TIER, tier);
+        return stack;
+    }
+
+    @Override
     public ActionResult use(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
 
         // Get selected spell from spellbook
         Identifier spellId = getSelectedSpell(stack);
+
+        // Ensure tier is clamped/present on use
+        resolveTier(stack);
 
         if (spellId == null) {
             if (world.isClient()) {
