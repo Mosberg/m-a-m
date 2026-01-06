@@ -711,3 +711,4 @@ rootProject.name = "mam"
 
 - `dk.mosberg.MAM` (main) - Runs on both client and server, register items/blocks here
 - `dk.mosberg.client.MAMClient` (client) - Runs only on client, register renderers/keybinds here
+- `dk.mosberg.datagen.MAMDataGenerator` (fabric-datagen) - Data generation entry point

@@ -301,12 +301,39 @@ Assets live in `src/main/resources/assets/mam/`:
   - `projectile/` - Air, Earth, Fire, Water spell projectiles
 - **lang/** - Translations (e.g., `en_us.json`)
 
+**Asset Linkage Pattern:** Each item requires 3 files:
+
+1. Item registration in Java code (e.g., `Registry.register(...)`)
+2. Model pointer: `assets/mam/items/moonstone.json` → `"model": "mam:item/moonstone"`
+3. Model definition: `assets/mam/models/item/moonstone.json` → `"textures": {"layer0": "mam:item/gemstone/moonstone"}`
+4. Texture file: `assets/mam/textures/item/gemstone/moonstone.png`
+
 ### Data-Driven Content
 
 Data packs live in `src/main/resources/data/mam/`:
 
 - **spells/** - Spell definitions organized by school (`air/`, `earth/`, `fire/`, `water/`)
 - Each school has base spells like `air_strike.json`, `earth_strike.json`, etc.
+
+**Spell JSON Schema Example** (`data/mam/spells/air/air_strike.json`):
+
+```json
+{
+  "id": "mam:air_strike",
+  "school": "air",
+  "tier": 1,
+  "manaCost": 12.0,
+  "damage": 2.0,
+  "range": 40.0,
+  "projectileSpeed": 1.5,
+  "vfx": {
+    "particleType": "wind_particle",
+    "color": "87CEEB"
+  }
+}
+```
+
+All spells follow this structure with required fields: `id`, `school`, `tier`, `manaCost`
 
 ## Content Design System
 
@@ -318,6 +345,141 @@ Data packs live in `src/main/resources/data/mam/`:
 - **Design Principle:** Each gemstone binds to a specific spell school
 
 When creating new content, follow the tier-based naming pattern and maintain school-to-gemstone associations.
+
+### Gemstone-School Binding System
+
+**Core Binding Relationships:**
+
+| Gemstone  | Spell School | Theme              | Visual Color   |
+| --------- | ------------ | ------------------ | -------------- |
+| Ruby      | Fire         | Destruction, Heat  | Red/Orange     |
+| Sapphire  | Water        | Healing, Flow      | Blue           |
+| Moonstone | Air          | Mobility, Wind     | Sky Blue/White |
+| Peridot   | Earth        | Defense, Stability | Green          |
+
+**Implementation Pattern:**
+
+When a player uses a spellbook or staff:
+
+1. System checks if the item has a bound gemstone (via NBT/custom data component)
+2. Gemstone determines which spell school's spells are accessible
+3. Staff/spellbook tier determines maximum spell tier available (Novice staff → tier 1 spells only)
+
+**Example Binding Flow:**
+
+- Player combines `staff_apprentice` + `moonstone` → Can cast Air school spells up to tier 2
+- Player combines `spellbook_master` + `ruby` → Can cast Fire school spells up to tier 4
+
+### Extending the Magic System
+
+#### Adding a New Spell School
+
+**Example: Adding "Lightning" school with Topaz gemstone**
+
+**Step 1:** Create gemstone item assets
+
+```
+assets/mam/textures/item/gemstone/topaz.png
+assets/mam/models/item/topaz.json:
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "mam:item/gemstone/topaz"
+  }
+}
+```
+
+**Step 2:** Create spell data structure
+
+```
+data/mam/spells/lightning/lightning_strike.json:
+{
+  "id": "mam:lightning_strike",
+  "school": "lightning",
+  "tier": 1,
+  "manaCost": 15.0,
+  "damage": 4.0,
+  "range": 50.0,
+  "vfx": {
+    "particleType": "electric_spark",
+    "color": "FFD700"
+  }
+}
+```
+
+**Step 3:** Register items in `MAM.java`
+
+```java
+public static final Item TOPAZ = Registry.register(
+    Registries.ITEM,
+    Identifier.of(MOD_ID, "topaz"),
+    new Item(new Item.Settings())
+);
+```
+
+**Step 4:** Add translations in `assets/mam/lang/en_us.json`
+
+```json
+{
+  "item.mam.topaz": "Topaz",
+  "spell.mam.lightning_strike": "Lightning Strike",
+  "school.mam.lightning": "Lightning"
+}
+```
+
+#### Adding a New Progression Tier
+
+**Example: Adding "Grandmaster" (Tier 5)**
+
+**Step 1:** Create staff/spellbook variants
+
+```
+assets/mam/textures/item/staff/staff_grandmaster.png
+assets/mam/textures/item/spellbook/spellbook_grandmaster.png
+```
+
+**Step 2:** Create item models following existing pattern
+
+```
+assets/mam/models/item/staff_grandmaster.json
+assets/mam/items/staff_grandmaster.json
+```
+
+**Step 3:** Create tier 5 spells for each school
+
+```
+data/mam/spells/fire/inferno.json:
+{
+  "id": "mam:inferno",
+  "school": "fire",
+  "tier": 5,
+  "manaCost": 50.0,
+  "damage": 15.0,
+  "aoeRadius": 10.0
+}
+```
+
+**Step 4:** Update tier validation logic to recognize tier 5
+
+- Modify spell casting system to allow tier 5 access for grandmaster items
+- Ensure progression gates respect the new tier (e.g., level requirements)
+
+#### Naming Conventions for Extensions
+
+- **Gemstones:** Single-word lowercase: `topaz`, `emerald`, `amethyst`
+- **Schools:** Single-word lowercase: `lightning`, `ice`, `nature`
+- **Tiers:** Follow progression: `novice`, `apprentice`, `adept`, `master`, `grandmaster`, `archmage`
+- **Spells:** `{school}_{action}`: `lightning_bolt`, `ice_shard`, `nature_growth`
+
+#### Required Consistency Checks
+
+When extending the system, ensure:
+
+- Each gemstone has exactly ONE associated school
+- Texture resolution is 16x16 pixels (Minecraft standard)
+- Model files reference correct texture paths using `mam:` namespace
+- Spell JSON includes all required fields: `id`, `school`, `tier`, `manaCost`
+- Translation keys follow pattern: `item.mam.{item_name}`, `spell.mam.{spell_id}`
 
 ## Dependency Information
 
