@@ -11,11 +11,11 @@ This document contains all TODO items from the codebase organized by implementat
 - [x] **SpellSchool.java** - Add school-specific stat modifiers (damage multiplier, mana cost, cooldown)
 - [x] **SpellSchool.java** - Implement school affinity system (players stronger in certain schools)
 - [x] **SpellSchool.java** - Add school weakness/resistance interactions (rock-paper-scissors style)
-- [ ] **SpellSchool.java** - Implement school-based enchantments (spellbooks/staffs specialize in school)
+- [x] **SpellSchool.java** - Implement school-based enchantments (spellbooks/staffs specialize in school)
 - [x] **SpellSchool.java** - Add environmental interactions per school (water floats, fire spreads)
-- [ ] **SpellSchool.java** - Implement school evolution (higher tiers unlock new mechanics)
-- [ ] **SpellSchool.java** - Add school combinations (hybrid schools for mixed-element spells)
-- [ ] **SpellSchool.java** - Implement school prestige/mastery system (unlock bonuses)
+- [x] **SpellSchool.java** - Implement school evolution (higher tiers unlock new mechanics)
+- [x] **SpellSchool.java** - Add school combinations (hybrid schools for mixed-element spells)
+- [x] **SpellSchool.java** - Implement school prestige/mastery system (unlock bonuses)
 
 ### Spell Cast Types
 
@@ -61,19 +61,19 @@ This document contains all TODO items from the codebase organized by implementat
 - [x] **SpellRegistry.java** - Implement spell compression for network transfer
 - [x] **SpellRegistry.java** - Add spell dependency resolution (spells requiring other spells)
 - [x] **SpellRegistry.java** - Implement spell variant/modification system
-- [ ] **SpellRegistry.java** - Add spell versioning and migration system
+- [x] **SpellRegistry.java** - Add spell versioning and migration system
 
 ### Spell Core Features
 
 - [x] **Spell.java** - Add spell upgrade/scaling system
-- [ ] **Spell.java** - Add spell combination/fusion recipes
-- [ ] **Spell.java** - Add spell modification system (transmutation)
-- [ ] **Spell.java** - Add spell presets/loadouts
-- [ ] **Spell.java** - Add spell tutorial/guidance system
+- [x] **Spell.java** - Add spell combination/fusion recipes
+- [x] **Spell.java** - Add spell modification system (transmutation)
+- [x] **Spell.java** - Add spell presets/loadouts
+- [x] **Spell.java** - Add spell tutorial/guidance system
 - [x] **Spell.java** - Add spell rarity/quality tiers
 - [x] **Spell.java** - Add spell unlock requirements/progression
 - [x] **Spell.java** - Add conditional spell effects based on environment
-- [ ] **Spell.java** - Add spell animation configuration
+- [x] **Spell.java** - Add spell animation configuration
 - [x] **Spell.java** - Add spell sound effect customization
 - [x] **Spell.java** - Add spell format versioning for compatibility
 
