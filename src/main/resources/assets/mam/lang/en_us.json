@@ -12,11 +12,13 @@
   "item.mam.staff_apprentice": "Apprentice Staff",
   "item.mam.staff_adept": "Adept Staff",
   "item.mam.staff_master": "Master Staff",
+  "item.mam.staff.no_spell": "No spell selected! Use a spellbook to select a spell.",
 
   "item.mam.spellbook_novice": "Novice Spellbook",
   "item.mam.spellbook_apprentice": "Apprentice Spellbook",
   "item.mam.spellbook_adept": "Adept Spellbook",
   "item.mam.spellbook_master": "Master Spellbook",
+  "item.mam.spellbook.open": "Opening spellbook... (GUI coming soon)",
 
   "item.mam.projectile_air": "Air Projectile",
   "item.mam.projectile_earth": "Earth Projectile",
@@ -31,6 +33,23 @@
   "mana.mam.pool.personal": "Personal Mana",
   "mana.mam.pool.aura": "Aura Mana",
   "mana.mam.pool.reserve": "Reserve Mana",
+  "mana.mam.insufficient": "Insufficient mana!",
+
+  "school.mam.air": "Air",
+  "school.mam.earth": "Earth",
+  "school.mam.fire": "Fire",
+  "school.mam.water": "Water",
+
+  "spell.mam.cast_type.projectile": "Projectile",
+  "spell.mam.cast_type.aoe": "Area of Effect",
+  "spell.mam.cast_type.utility": "Utility",
+  "spell.mam.cast_type.ritual": "Ritual",
+  "spell.mam.cast_type.synergy": "Synergy",
+
+  "spell.mam.air_strike": "Air Strike",
+  "spell.mam.earth_strike": "Earth Strike",
+  "spell.mam.fire_strike": "Fire Strike",
+  "spell.mam.water_strike": "Water Strike",
 
   "tooltip.mam.staff.tier": "Tier: %s",
   "tooltip.mam.staff.school": "School: %s",
