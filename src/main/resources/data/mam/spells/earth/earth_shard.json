@@ -1,0 +1,28 @@
+{
+  "id": "mam:earth_shard",
+  "name": "Earth Shard",
+  "school": "earth",
+  "description": "A heavier shard of stone that slams targets and can stagger them.",
+  "castType": "projectile",
+  "manaCost": 16.0,
+  "castTime": 1.0,
+  "cooldown": 6.0,
+  "tier": 2,
+  "requiredLevel": 6,
+  "damage": 7.0,
+  "range": 48.0,
+  "projectileSpeed": 1.6,
+  "aoeRadius": 6.0,
+  "knockback": 2.5,
+  "statusEffects": [{ "effect": "stun", "duration": 50, "amplifier": 1 }],
+  "customData": {
+    "width": 3.0
+  },
+  "sound": "block.stone.break",
+  "vfx": {
+    "particleType": "block",
+    "particleCount": 28,
+    "color": "696969"
+  },
+  "tags": ["strike", "projectile", "tier2", "earth"]
+}

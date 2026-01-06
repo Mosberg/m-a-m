@@ -42,6 +42,7 @@ public class SpellProjectileEntity extends ProjectileEntity implements FlyingIte
     private SpellSchool school = SpellSchool.FIRE;
     private float damage = 2.0f;
     private float knockback = 0.0f;
+    private int tier = 1; // Spell tier for visual scaling
     private int maxAge = 200; // 10 seconds
     private int age = 0;
 
@@ -56,6 +57,7 @@ public class SpellProjectileEntity extends ProjectileEntity implements FlyingIte
         setSchool(spell.getSchool());
         this.damage = spell.getDamage();
         this.knockback = spell.getKnockback();
+        this.tier = spell.getTier();
         float speed = Math.max(0.05f, spell.getProjectileSpeed());
         this.maxAge = Math.min(200, Math.max(40, Math.round((spell.getRange() / speed) * 20f)));
 
@@ -136,9 +138,7 @@ public class SpellProjectileEntity extends ProjectileEntity implements FlyingIte
         float drag = this.isTouchingWater() ? 0.8f : 0.99f;
         this.setVelocity(velocity.multiply(drag));
 
-        if (this.getEntityWorld().isClient()) {
-            spawnParticles();
-        }
+        spawnParticles();
     }
 
     @Override
@@ -188,10 +188,7 @@ public class SpellProjectileEntity extends ProjectileEntity implements FlyingIte
     }
 
     private void spawnParticles() {
-        // Particle spawning will be handled by renderer
-    }
-
-    private void spawnImpactParticles() {
+        // Server-side spawn so it replicates to all clients without client imports
         if (!(this.getEntityWorld() instanceof ServerWorld serverWorld)) {
             return;
         }
@@ -201,29 +198,82 @@ public class SpellProjectileEntity extends ProjectileEntity implements FlyingIte
         switch (getSchool()) {
             case FIRE -> {
                 effect = ParticleTypes.FLAME;
-                count = 12;
+                count = scaledTrailCount();
             }
             case WATER -> {
                 effect = ParticleTypes.SPLASH;
-                count = 12;
+                count = scaledTrailCount();
             }
             case AIR -> {
                 effect = ParticleTypes.CLOUD;
-                count = 10;
+                count = scaledTrailCount();
             }
             case EARTH -> {
                 effect = new BlockStateParticleEffect(ParticleTypes.BLOCK,
                         Blocks.DIRT.getDefaultState());
-                count = 12;
+                count = scaledTrailCount();
             }
             default -> {
                 effect = ParticleTypes.CRIT;
-                count = 8;
+                count = Math.max(1, scaledTrailCount() - 1);
             }
         }
 
-        serverWorld.spawnParticles(effect, this.getX(), this.getBodyY(0.5), this.getZ(), count, 0.2,
-                0.2, 0.2, 0.02);
+        serverWorld.spawnParticles(effect, this.getX(), this.getBodyY(0.5), this.getZ(), count,
+                0.05, 0.05, 0.05, 0.02);
+    }
+
+    private int scaledTrailCount() {
+        // Scale trail particle count per tier: tier1=2, tier2=3-4, tier3=5-8, tier4=9-12
+        return switch (this.tier) {
+            case 1 -> 2;
+            case 2 -> 4;
+            case 3 -> 7;
+            case 4 -> 11;
+            default -> 2;
+        };
+    }
+
+    private void spawnImpactParticles() {
+        if (!(this.getEntityWorld() instanceof ServerWorld serverWorld)) {
+            return;
+        }
+
+        ParticleEffect effect;
+        int baseCount;
+        switch (getSchool()) {
+            case FIRE -> {
+                effect = ParticleTypes.DRIPPING_OBSIDIAN_TEAR;
+                baseCount = 18;
+            }
+            case WATER -> {
+                effect = ParticleTypes.SPLASH;
+                baseCount = 16;
+            }
+            case AIR -> {
+                effect = ParticleTypes.HAPPY_VILLAGER;
+                baseCount = 16;
+            }
+            case EARTH -> {
+                effect = new BlockStateParticleEffect(ParticleTypes.BLOCK,
+                        Blocks.DIRT.getDefaultState());
+                baseCount = 18;
+            }
+            default -> {
+                effect = ParticleTypes.CRIT;
+                baseCount = 10;
+            }
+        }
+
+        int count = scaledImpactCount(baseCount);
+        serverWorld.spawnParticles(effect, this.getX(), this.getBodyY(0.5), this.getZ(), count, 0.3,
+                0.3, 0.3, 0.05);
+    }
+
+    private int scaledImpactCount(int base) {
+        // Scale burst intensity slightly with damage to keep higher-tiers looking stronger
+        int bonus = (int) Math.max(0, Math.round(this.damage));
+        return Math.max(base, base + bonus);
     }
 
     @Override
@@ -232,6 +282,7 @@ public class SpellProjectileEntity extends ProjectileEntity implements FlyingIte
         view.putString("School", school.name());
         view.putFloat("Damage", damage);
         view.putFloat("Knockback", knockback);
+        view.putInt("Tier", tier);
         view.putInt("Age", age);
     }
 
@@ -247,6 +298,7 @@ public class SpellProjectileEntity extends ProjectileEntity implements FlyingIte
 
         this.damage = view.getFloat("Damage", this.damage);
         this.knockback = view.getFloat("Knockback", this.knockback);
+        this.tier = view.getInt("Tier", this.tier);
         this.age = view.getInt("Age", this.age);
     }
 }

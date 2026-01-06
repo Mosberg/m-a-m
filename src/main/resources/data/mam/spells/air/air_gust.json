@@ -1,0 +1,28 @@
+{
+  "id": "mam:air_gust",
+  "name": "Air Gust",
+  "school": "air",
+  "description": "A sharper gust that strikes from afar, pushing foes back with greater force.",
+  "castType": "projectile",
+  "manaCost": 14.0,
+  "castTime": 1.0,
+  "cooldown": 5.0,
+  "tier": 2,
+  "requiredLevel": 6,
+  "damage": 4.0,
+  "range": 50.0,
+  "projectileSpeed": 1.7,
+  "aoeRadius": 6.0,
+  "knockback": 1.5,
+  "statusEffects": [],
+  "customData": {
+    "width": 3.0
+  },
+  "sound": "entity.wind_charge.wind_burst",
+  "vfx": {
+    "particleType": "wind_particle",
+    "particleCount": 28,
+    "color": "87CEEB"
+  },
+  "tags": ["strike", "projectile", "tier2", "air"]
+}
